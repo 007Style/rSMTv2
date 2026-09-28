@@ -42,29 +42,29 @@
             <Label text="rSMT Delay (cycles)" styleClass="param-label"/>
             <Spinner fx:id="rSmtDelaySpinner" editable="true" styleClass="param-spinner"/>
 
-            <!-- % Integer -->
-            <Label text="% Integer (FXU)" styleClass="param-label"/>
+            <!-- Integer mix -->
+            <Label fx:id="labelPercentInt" styleClass="param-label"/>
             <Slider fx:id="percentIntSlider" min="0" max="100" value="60" showTickMarks="true"
                     showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
-            <Label fx:id="percentIntLabel" text="60%" styleClass="slider-value-label"/>
+            <Label fx:id="percentIntLabel" styleClass="slider-value-label"/>
 
-            <!-- % Load/Store -->
-            <Label text="% Load/Store" styleClass="param-label"/>
+            <!-- Load/Store mix -->
+            <Label fx:id="labelPercentLoad" styleClass="param-label"/>
             <Slider fx:id="percentLoadSlider" min="0" max="100" value="15" showTickMarks="true"
                     showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
-            <Label fx:id="percentLoadLabel" text="15%" styleClass="slider-value-label"/>
+            <Label fx:id="percentLoadLabel" styleClass="slider-value-label"/>
 
-            <!-- % rSMT Availability -->
-            <Label text="% rSMT Availability" styleClass="param-label"/>
+            <!-- rSMT availability -->
+            <Label fx:id="labelRsmtAvail" styleClass="param-label"/>
             <Slider fx:id="rSmtAvailSlider" min="0" max="100" value="60" showTickMarks="true"
                     showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
-            <Label fx:id="rSmtAvailLabel" text="60%" styleClass="slider-value-label"/>
+            <Label fx:id="rSmtAvailLabel" styleClass="slider-value-label"/>
 
-            <!-- % Data Dependency -->
-            <Label text="% Data Dependency" styleClass="param-label"/>
+            <!-- Data dependency -->
+            <Label fx:id="labelRsmtDepends" styleClass="param-label"/>
             <Slider fx:id="rSmtDependsSlider" min="0" max="100" value="20" showTickMarks="true"
                     showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
-            <Label fx:id="rSmtDependsLabel" text="20%" styleClass="slider-value-label"/>
+            <Label fx:id="rSmtDependsLabel" styleClass="slider-value-label"/>
 
             <Separator/>
             <Label text="ANIMATION SPEED" styleClass="panel-header"/>
@@ -143,7 +143,7 @@
             </BarChart>
 
             <!-- Unit utilization -->
-            <Label text="Unit Utilization %" styleClass="chart-label"/>
+            <Label text="Unit Utilization" styleClass="chart-label"/>
             <BarChart fx:id="utilChart" styleClass="rsmt-chart" prefHeight="150" animated="false" legendVisible="false">
                 <xAxis><CategoryAxis animated="false"/></xAxis>
                 <yAxis><NumberAxis animated="false" forceZeroInRange="true" lowerBound="0" upperBound="100"/></yAxis>

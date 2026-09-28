@@ -33,6 +33,10 @@ public class SimulationController implements Initializable {
     @FXML private Slider            percentLoadSlider;
     @FXML private Slider            rSmtAvailSlider;
     @FXML private Slider            rSmtDependsSlider;
+    @FXML private Label             labelPercentInt;
+    @FXML private Label             labelPercentLoad;
+    @FXML private Label             labelRsmtAvail;
+    @FXML private Label             labelRsmtDepends;
     @FXML private Label             percentIntLabel;
     @FXML private Label             percentLoadLabel;
     @FXML private Label             rSmtAvailLabel;
@@ -87,11 +91,17 @@ public class SimulationController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Spinners need programmatic ValueFactory (FXML min/max attributes are ignored without it)
+        // Spinners need programmatic ValueFactory
         numInstSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(10, 100_000, 500));
         rSmtDelaySpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0));
+
+        // Static labels that contain % must be set in code (FXML treats % as resource key prefix)
+        labelPercentInt.setText("% Integer (FXU)");
+        labelPercentLoad.setText("% Load/Store");
+        labelRsmtAvail.setText("% rSMT Availability");
+        labelRsmtDepends.setText("% Data Dependency");
 
         bindSliderLabels();
         initSpeedCombo();
