@@ -411,6 +411,18 @@ public class SimulationController implements Initializable {
         pauseButton.setText(nowPaused ? "▶ Resume" : "⏸ Pause");
     }
 
+    /**
+     * Called by {@link MainApp} when the window close button is pressed.
+     * Cancels any running simulation task and unblocks the engine thread
+     * so the daemon thread exits and the JVM can shut down cleanly.
+     */
+    void shutdown() {
+        guiControl.shutdown();
+        if (simTask != null && simTask.isRunning()) {
+            simTask.cancel(true);
+        }
+    }
+
     @FXML
     private void onReset() {
         if (simTask != null && simTask.isRunning()) {

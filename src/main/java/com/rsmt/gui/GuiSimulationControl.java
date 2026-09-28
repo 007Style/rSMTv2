@@ -22,15 +22,22 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public final class GuiSimulationControl implements SimulationControl {
 
-    private final AtomicBoolean paused     = new AtomicBoolean(false);
-    private final AtomicBoolean smtEnabled = new AtomicBoolean(true);
+    private final AtomicBoolean paused      = new AtomicBoolean(false);
+    private final AtomicBoolean smtEnabled  = new AtomicBoolean(true);
     private final AtomicLong    tickDelayMs = new AtomicLong(500L);
+    /** Set on window close — unblocks any pause loop immediately. */
+    private final AtomicBoolean shutdown    = new AtomicBoolean(false);
 
-    @Override public boolean isPaused()        { return paused.get(); }
-    @Override public boolean isSmtEnabled()    { return smtEnabled.get(); }
-    @Override public long    getTickDelayMs()  { return tickDelayMs.get(); }
+    /** Returns false when shut down so a spin-waiting engine thread can exit. */
+    @Override public boolean isPaused()       { return !shutdown.get() && paused.get(); }
+    @Override public boolean isSmtEnabled()   { return smtEnabled.get(); }
+    /** Returns 0 when shut down so Thread.sleep doesn't delay JVM exit. */
+    @Override public long    getTickDelayMs() { return shutdown.get() ? 0L : tickDelayMs.get(); }
 
-    public void setPaused(boolean v)       { paused.set(v); }
-    public void setSmtEnabled(boolean v)   { smtEnabled.set(v); }
-    public void setTickDelayMs(long ms)    { tickDelayMs.set(ms); }
+    public void setPaused(boolean v)      { paused.set(v); }
+    public void setSmtEnabled(boolean v)  { smtEnabled.set(v); }
+    public void setTickDelayMs(long ms)   { tickDelayMs.set(ms); }
+
+    /** Called on window close. Unblocks any paused/sleeping engine thread. */
+    public void shutdown() { shutdown.set(true); paused.set(false); }
 }

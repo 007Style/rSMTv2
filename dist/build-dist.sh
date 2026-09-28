@@ -68,8 +68,7 @@ jpackage \
     --description  "IBM PowerPC Reverse SMT Processor Simulator" \
     --vendor       "IBM Bob & Daneyand"    \
     --dest         "$OUT_DIR"              \
-    --icon         "$ICON"                 \
-    ${PKG_TYPE:+--type "$PKG_TYPE"}
+    --icon         "$ICON"
 
 # List output
 echo ""

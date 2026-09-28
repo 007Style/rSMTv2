@@ -1,6 +1,7 @@
 package com.rsmt.gui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -23,6 +24,7 @@ public class MainApp extends Application {
 
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
         Scene scene = new Scene(loader.load(), 1400, 930);
+        SimulationController controller = loader.getController();
 
         // Load dark theme CSS
         URL cssUrl = getClass().getResource("styles.css");
@@ -40,6 +42,12 @@ public class MainApp extends Application {
         if (iconUrl != null) {
             stage.getIcons().add(new Image(iconUrl.toExternalForm()));
         }
+
+        // Clean shutdown: cancel any running sim thread then exit the JVM.
+        stage.setOnCloseRequest(e -> {
+            if (controller != null) controller.shutdown();
+            Platform.exit();
+        });
 
         stage.show();
     }

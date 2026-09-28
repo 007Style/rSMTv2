@@ -4,6 +4,9 @@ import com.rsmt.core.*;
 import com.rsmt.gui.MainApp;
 import com.rsmt.sim.*;
 
+import java.awt.Taskbar;
+import java.awt.Toolkit;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -19,6 +22,7 @@ public class Main {
 
     public static void main(String[] args) {
         if (args.length == 0) {
+            setMacOsDockIcon();
             MainApp.launchGui(args);
             return;
         }
@@ -52,6 +56,27 @@ public class Main {
         } catch (IllegalArgumentException e) {
             System.err.println("ERROR: invalid argument: " + e.getMessage());
             System.exit(1);
+        }
+    }
+
+    /**
+     * Sets the macOS Dock icon before JavaFX launches.
+     * {@code java.awt.Taskbar} must be called on the main thread before
+     * {@code Application.launch()} — this is the only reliable place to do it.
+     * Silently ignored on non-macOS platforms or when the API is unavailable.
+     */
+    private static void setMacOsDockIcon() {
+        try {
+            if (!Taskbar.isTaskbarSupported()) return;
+            Taskbar taskbar = Taskbar.getTaskbar();
+            if (!taskbar.isSupported(Taskbar.Feature.ICON_IMAGE)) return;
+            InputStream is = Main.class.getResourceAsStream(
+                    "/com/rsmt/gui/icon.png");
+            if (is == null) return;
+            java.awt.Image awtIcon = Toolkit.getDefaultToolkit().createImage(is.readAllBytes());
+            taskbar.setIconImage(awtIcon);
+        } catch (Exception ignored) {
+            // Non-fatal — app still runs without Dock icon
         }
     }
 
