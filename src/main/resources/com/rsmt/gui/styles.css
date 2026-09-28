@@ -184,11 +184,48 @@
     -fx-background-color: #1a1a2e;
 }
 
-/* Row header labels */
+/* Section headers in the pipeline grid */
+.section-header {
+    -fx-text-fill: #00d4aa;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-min-width: 80px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 2 4 2 0;
+}
+
+.section-header-remote {
+    -fx-text-fill: #ff9944;
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-min-width: 80px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 2 4 2 0;
+}
+
+.divider-label {
+    -fx-text-fill: #2a3a5a;
+    -fx-font-size: 9px;
+    -fx-min-width: 80px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 1 0 1 0;
+}
+
+/* Row header labels — local core */
 .row-header {
     -fx-text-fill: #8892b0;
     -fx-font-size: 10px;
-    -fx-min-width: 56px;
+    -fx-min-width: 80px;
+    -fx-alignment: CENTER_RIGHT;
+    -fx-padding: 0 4 0 0;
+}
+
+/* Row header labels — remote core */
+.row-header-remote {
+    -fx-text-fill: #ff9944;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-min-width: 80px;
     -fx-alignment: CENTER_RIGHT;
     -fx-padding: 0 4 0 0;
 }
@@ -218,12 +255,18 @@
 
 /* Instruction type colours */
 .cell-fxu    { -fx-background-color: #1a7a4a; -fx-text-fill: #b8ffd9; }
-.cell-fxu1   { -fx-background-color: #0d5c35; -fx-text-fill: #b8ffd9; -fx-border-color: #00d4aa; -fx-border-width: 1; -fx-border-radius: 3; }
 .cell-fpu    { -fx-background-color: #1a3a7a; -fx-text-fill: #b8d4ff; }
 .cell-branch { -fx-background-color: #7a6a1a; -fx-text-fill: #fff0b8; }
 .cell-load   { -fx-background-color: #1a6a7a; -fx-text-fill: #b8f0ff; }
 .cell-store  { -fx-background-color: #1a507a; -fx-text-fill: #b8e4ff; }
 .cell-nop    { -fx-background-color: #2a2a3e; -fx-text-fill: #666688; }
+
+/* Remote core cell overlay — orange tint border to show rSMT offload */
+.cell-remote {
+    -fx-border-color: #ff9944;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+}
 
 /* Stall highlights */
 .cell-stall-structural { -fx-background-color: #5a1a1a; -fx-text-fill: #ff9999; }
@@ -237,19 +280,33 @@
     -fx-border-width: 1 0 0 0;
 }
 
-.legend-fxu    { -fx-text-fill: #1aff7a; -fx-font-size: 10px; }
-.legend-fpu    { -fx-text-fill: #4488ff; -fx-font-size: 10px; }
-.legend-branch { -fx-text-fill: #ffdd44; -fx-font-size: 10px; }
-.legend-load   { -fx-text-fill: #44ddff; -fx-font-size: 10px; }
-.legend-store  { -fx-text-fill: #44bbff; -fx-font-size: 10px; }
-.legend-nop    { -fx-text-fill: #888899; -fx-font-size: 10px; }
-.legend-stall  { -fx-text-fill: #8892b0; -fx-font-size: 10px; }
+.legend-fxu         { -fx-text-fill: #1aff7a; -fx-font-size: 10px; }
+.legend-fpu         { -fx-text-fill: #4488ff; -fx-font-size: 10px; }
+.legend-branch      { -fx-text-fill: #ffdd44; -fx-font-size: 10px; }
+.legend-load        { -fx-text-fill: #44ddff; -fx-font-size: 10px; }
+.legend-nop         { -fx-text-fill: #888899; -fx-font-size: 10px; }
+.legend-stall-struct { -fx-text-fill: #ff9999; -fx-font-size: 10px; }
+.legend-stall-data   { -fx-text-fill: #ffe699; -fx-font-size: 10px; }
+.legend-stall-ctrl   { -fx-text-fill: #99b8ff; -fx-font-size: 10px; }
 
-/* ─── Analytics panel ───────────────────────────────────────────── */
+/* ─── Main split pane ────────────────────────────────────────────── */
+.main-split {
+    -fx-background-color: #1a1a2e;
+    -fx-padding: 0;
+}
+
+.main-split > .split-pane-divider {
+    -fx-background-color: #0f3460;
+    -fx-padding: 0 1 0 1;
+}
+
+/* ─── Analytics panel ────────────────────────────────────────────── */
 .analytics-panel {
     -fx-background-color: #16213e;
     -fx-border-color: #0f3460;
     -fx-border-width: 0 0 0 2;
+    -fx-min-width: 280px;
+    -fx-max-width: 340px;
 }
 
 .chart-label {

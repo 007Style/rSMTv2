@@ -23,6 +23,12 @@ import java.util.*;
  * <p>Wires UI controls → {@link SimulationConfig}, starts a background
  * {@link Task} that runs {@link SimulationEngine}, and updates the live
  * pipeline grid and analytics charts on every {@link ClockEvent}.</p>
+ *
+ * <h3>Pipeline grid layout</h3>
+ * <p>Uses PowerPC 600-style stage labels: Fetch → Dispatch → Execute → Complete → Retire.
+ * Row 0 is the cycle-number header. Execution unit rows follow — LOCAL CORE rows first
+ * (FXU0, FPU0, Branch, LSU), then a section divider, then REMOTE CORE rows (FXU1, FPU1)
+ * which are only shown when rSMT is active.</p>
  */
 public class SimulationController implements Initializable {
 
@@ -54,9 +60,10 @@ public class SimulationController implements Initializable {
     @FXML private Label ipcLabel;
     @FXML private Label smtStatusLabel;
     @FXML private Label gainLabel;
+    @FXML private Label pipelineHeaderLabel;
 
     // ─── Pipeline grid ────────────────────────────────────────────────────────
-    @FXML private GridPane  pipelineGrid;
+    @FXML private GridPane   pipelineGrid;
     @FXML private ScrollPane pipelineScroll;
 
     // ─── Charts ──────────────────────────────────────────────────────────────
@@ -69,13 +76,34 @@ public class SimulationController implements Initializable {
     private final GuiSimulationControl guiControl = new GuiSimulationControl();
     private Task<SimulationResult>     simTask;
     private XYChart.Series<Number, Number> ipcSeries;
-    private int currentCycleColumn = 0;
+    private int  currentCycleColumn = 0;
+    private boolean lastSmtActive   = true;   // tracks whether remote rows are shown
 
-    // Row order must match ALL_SLOTS in SimulationEngine
-    private static final List<String> SLOT_ROWS =
-            List.of(SimulationEngine.SLOT_FXU0, SimulationEngine.SLOT_FXU1,
-                    SimulationEngine.SLOT_FPU0,  SimulationEngine.SLOT_FPU1,
-                    SimulationEngine.SLOT_BRANCH, SimulationEngine.SLOT_LSU);
+    // ─── PowerPC 600-style stage label ───────────────────────────────────────
+    private static final String STAGE_LABEL =
+            "PIPELINE VIEW  (Fetch → Dispatch → Execute → Complete → Retire)";
+
+    /**
+     * LOCAL CORE rows — always visible.
+     * The order defines their grid row index (1-based, row 0 = cycle header).
+     */
+    private static final List<String> LOCAL_ROWS =
+            List.of(SimulationEngine.SLOT_FXU0,
+                    SimulationEngine.SLOT_FPU0,
+                    SimulationEngine.SLOT_BRANCH,
+                    SimulationEngine.SLOT_LSU);
+
+    /**
+     * REMOTE CORE rows — only visible when rSMT is active.
+     */
+    private static final List<String> REMOTE_ROWS =
+            List.of(SimulationEngine.SLOT_FXU1,
+                    SimulationEngine.SLOT_FPU1);
+
+    // Computed grid row indices (assigned in initPipelineGridHeaders)
+    private int dividerRow     = -1;
+    private int remoteCoreRow  = -1; // row index of the "REMOTE CORE" section header
+    private int firstRemoteRow = -1; // row index of FXU1
 
     private static final Map<String, Long> SPEED_MAP = new LinkedHashMap<>();
     static {
@@ -103,10 +131,13 @@ public class SimulationController implements Initializable {
         labelRsmtAvail.setText("% rSMT Availability");
         labelRsmtDepends.setText("% Data Dependency");
 
+        // PowerPC 600-style stage header
+        pipelineHeaderLabel.setText(STAGE_LABEL);
+
         bindSliderLabels();
         initSpeedCombo();
         initCharts();
-        initPipelineGridHeaders();
+        initPipelineGridHeaders(true);
         smtToggle.selectedProperty().addListener((obs, o, v) -> {
             guiControl.setSmtEnabled(v);
             smtToggle.setText(v ? "rSMT ON" : "rSMT OFF");
@@ -139,16 +170,68 @@ public class SimulationController implements Initializable {
         ipcChart.getData().add(ipcSeries);
     }
 
-    // ─── Pipeline grid headers (row labels, built once) ──────────────────────
+    // ─── Pipeline grid headers ───────────────────────────────────────────────
 
-    private void initPipelineGridHeaders() {
-        // Column 0 = row-label column; subsequent columns = clock cycles
-        for (int row = 0; row < SLOT_ROWS.size(); row++) {
-            Label lbl = new Label(SLOT_ROWS.get(row));
+    /**
+     * Builds the fixed row-label column (column 0) of the pipeline grid.
+     *
+     * <p>Layout (1-based grid rows):
+     * <pre>
+     *   row 0  : cycle number headers  (added per tick)
+     *   row 1  : "LOCAL CORE" section label
+     *   rows 2…5 : FXU0, FPU0, Branch, LSU
+     *   row 6  : ─── divider ───
+     *   row 7  : "REMOTE CORE" section label   (hidden when SMT off)
+     *   rows 8…9 : FXU1, FPU1                  (hidden when SMT off)
+     * </pre>
+     * </p>
+     */
+    private void initPipelineGridHeaders(boolean smtActive) {
+        pipelineGrid.getChildren().clear();
+        currentCycleColumn = 1;
+        lastSmtActive = smtActive;
+
+        int row = 0; // row 0 reserved for cycle numbers
+
+        // "LOCAL CORE" section header
+        row++;
+        Label localHeader = new Label("LOCAL CORE");
+        localHeader.getStyleClass().add("section-header");
+        pipelineGrid.add(localHeader, 0, row);
+
+        // Local execution unit rows
+        for (String slot : LOCAL_ROWS) {
+            row++;
+            Label lbl = new Label(slot);
             lbl.getStyleClass().add("row-header");
-            pipelineGrid.add(lbl, 0, row + 1); // +1 because row 0 = cycle numbers
+            pipelineGrid.add(lbl, 0, row);
         }
-        currentCycleColumn = 1; // next column to populate
+
+        // Divider row
+        row++;
+        dividerRow = row;
+        Label divLbl = new Label("─────");
+        divLbl.getStyleClass().add("divider-label");
+        pipelineGrid.add(divLbl, 0, row);
+
+        // Remote core section — only add labels if SMT active
+        row++;
+        remoteCoreRow = row;
+        Label remoteHeader = new Label("REMOTE CORE");
+        remoteHeader.getStyleClass().add("section-header-remote");
+        remoteHeader.setVisible(smtActive);
+        remoteHeader.setManaged(smtActive);
+        pipelineGrid.add(remoteHeader, 0, row);
+
+        firstRemoteRow = row + 1;
+        for (String slot : REMOTE_ROWS) {
+            row++;
+            Label lbl = new Label(slot);
+            lbl.getStyleClass().add("row-header-remote");
+            lbl.setVisible(smtActive);
+            lbl.setManaged(smtActive);
+            pipelineGrid.add(lbl, 0, row);
+        }
     }
 
     // ─── Button handlers ─────────────────────────────────────────────────────
@@ -204,7 +287,7 @@ public class SimulationController implements Initializable {
             simTask.cancel();
             guiControl.setPaused(false);
         }
-        clearPipelineGrid();
+        initPipelineGridHeaders(true);
         clearCharts();
         cycleCountLabel.setText("0");
         ipcLabel.setText("0.000");
@@ -226,6 +309,12 @@ public class SimulationController implements Initializable {
         smtStatusLabel.setText(smt ? "rSMT ON" : "rSMT OFF");
         smtStatusLabel.getStyleClass().setAll(smt ? "smt-on-label" : "smt-off-label");
 
+        // Show/hide REMOTE CORE rows when SMT state changes
+        if (smt != lastSmtActive) {
+            updateRemoteCoreVisibility(smt);
+            lastSmtActive = smt;
+        }
+
         // IPC series (sample every 5 ticks to keep chart smooth)
         if (event.cycleNumber() % 5 == 0) {
             ipcSeries.getData().add(
@@ -238,6 +327,25 @@ public class SimulationController implements Initializable {
 
         // Pipeline grid: add a new column for this cycle
         addPipelineColumn(event);
+    }
+
+    /**
+     * Shows or hides the REMOTE CORE section header and execution unit rows
+     * based on whether rSMT is currently active.
+     */
+    private void updateRemoteCoreVisibility(boolean smtActive) {
+        pipelineGrid.getChildren().forEach(node -> {
+            Integer row = GridPane.getRowIndex(node);
+            if (row == null) return;
+            if (row == remoteCoreRow || (row >= firstRemoteRow && row < firstRemoteRow + REMOTE_ROWS.size())) {
+                // Only toggle the row-label nodes in column 0
+                Integer col = GridPane.getColumnIndex(node);
+                if (col == null || col == 0) {
+                    node.setVisible(smtActive);
+                    node.setManaged(smtActive);
+                }
+            }
+        });
     }
 
     // ─── Completion handler ───────────────────────────────────────────────────
@@ -275,7 +383,16 @@ public class SimulationController implements Initializable {
 
     /**
      * Adds one column (one clock cycle) to the scrollable pipeline grid.
-     * Row 0 = cycle number header; rows 1..6 = one slot each.
+     *
+     * <p>Grid row layout:
+     * <pre>
+     *   row 0          : cycle number header
+     *   row 1          : "LOCAL CORE" label (no cell)
+     *   rows 2…5       : FXU0, FPU0, Branch, LSU
+     *   row 6          : divider (no cell)
+     *   row 7          : "REMOTE CORE" label (no cell)
+     *   rows 8…9       : FXU1, FPU1
+     * </pre>
      */
     private void addPipelineColumn(ClockEvent event) {
         int col = currentCycleColumn;
@@ -285,12 +402,32 @@ public class SimulationController implements Initializable {
         cycleLbl.getStyleClass().add("cycle-header");
         pipelineGrid.add(cycleLbl, col, 0);
 
-        // One cell per slot row
-        for (int row = 0; row < SLOT_ROWS.size(); row++) {
-            String slot = SLOT_ROWS.get(row);
+        // Local core rows: start at grid row 2 (row 1 = section header, row 2 = FXU0)
+        int gridRow = 2;
+        for (String slot : LOCAL_ROWS) {
             Instruction inst = event.slotSnapshot().get(slot);
             Label cell = buildCell(slot, inst, event);
-            pipelineGrid.add(cell, col, row + 1);
+            pipelineGrid.add(cell, col, gridRow);
+            gridRow++;
+        }
+
+        // Skip divider row (gridRow is now dividerRow index)
+        gridRow++; // skip divider
+        // Skip remote core section header
+        gridRow++; // skip "REMOTE CORE" label row
+
+        // Remote core rows — add cells even if hidden (grid needs cells to fill)
+        for (String slot : REMOTE_ROWS) {
+            Instruction inst = event.slotSnapshot().get(slot);
+            Label cell = buildCell(slot, inst, event);
+            // Mark remote cells as remote for distinct styling
+            if (!cell.getStyleClass().contains("cell-idle")) {
+                cell.getStyleClass().add("cell-remote");
+            }
+            cell.setVisible(event.smtActive());
+            cell.setManaged(event.smtActive());
+            pipelineGrid.add(cell, col, gridRow);
+            gridRow++;
         }
 
         currentCycleColumn++;
@@ -338,7 +475,7 @@ public class SimulationController implements Initializable {
 
     private static String instStyle(String slot, Instruction inst) {
         return switch (inst) {
-            case FxuInstruction    i -> slot.equals(SimulationEngine.SLOT_FXU1) ? "cell-fxu1" : "cell-fxu";
+            case FxuInstruction    i -> "cell-fxu";
             case FpuInstruction    i -> "cell-fpu";
             case BranchInstruction i -> "cell-branch";
             case LoadInstruction   i -> "cell-load";
@@ -372,12 +509,6 @@ public class SimulationController implements Initializable {
         runButton.setDisable(running);
         pauseButton.setDisable(!running);
         if (!running) pauseButton.setText("⏸ Pause");
-    }
-
-    private void clearPipelineGrid() {
-        pipelineGrid.getChildren().clear();
-        currentCycleColumn = 1;
-        initPipelineGridHeaders();
     }
 
     private void clearCharts() {

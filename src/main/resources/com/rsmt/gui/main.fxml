@@ -4,7 +4,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.chart.*?>
-<?import javafx.scene.text.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -89,74 +88,75 @@
         </VBox>
     </left>
 
-    <!-- ═══════════════════════  CENTER — Pipeline Grid  ═══════════════════════ -->
+    <!-- ═══════════════════════  CENTER — Pipeline + Analytics side-by-side ═══════════════════════ -->
     <center>
-        <VBox styleClass="pipeline-panel" spacing="0">
-            <Label text="PIPELINE VIEW  (Fetch → Decode → Issue → Execute)" styleClass="panel-header"
-                   style="-fx-padding: 8 12 4 12;"/>
-            <Separator/>
-            <ScrollPane fx:id="pipelineScroll" fitToHeight="false" fitToWidth="false"
-                        hbarPolicy="ALWAYS" vbarPolicy="NEVER" styleClass="pipeline-scroll"
-                        VBox.vgrow="ALWAYS">
-                <GridPane fx:id="pipelineGrid" styleClass="pipeline-grid" hgap="2" vgap="1">
-                    <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
-                </GridPane>
-            </ScrollPane>
+        <SplitPane dividerPositions="0.65" styleClass="main-split">
 
-            <!-- Stage legend row -->
-            <HBox styleClass="stage-legend" spacing="12">
-                <padding><Insets top="4" right="12" bottom="6" left="12"/></padding>
-                <Label text="■ FXU" styleClass="legend-fxu"/>
-                <Label text="■ FPU" styleClass="legend-fpu"/>
-                <Label text="■ Branch" styleClass="legend-branch"/>
-                <Label text="■ Load" styleClass="legend-load"/>
-                <Label text="■ Store" styleClass="legend-store"/>
-                <Label text="■ NOP" styleClass="legend-nop"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label text="🟥 Structural stall" styleClass="legend-stall"/>
-                <Label text="🟨 Data stall" styleClass="legend-stall"/>
-                <Label text="🟦 Control stall" styleClass="legend-stall"/>
-            </HBox>
-        </VBox>
+            <!-- ── LEFT SPLIT: Pipeline grid ── -->
+            <VBox styleClass="pipeline-panel" spacing="0" SplitPane.resizableWithParent="true">
+                <Label fx:id="pipelineHeaderLabel" styleClass="panel-header"
+                       style="-fx-padding: 8 12 4 12;"/>
+                <Separator/>
+                <ScrollPane fx:id="pipelineScroll" fitToHeight="false" fitToWidth="false"
+                            hbarPolicy="ALWAYS" vbarPolicy="AS_NEEDED" styleClass="pipeline-scroll"
+                            VBox.vgrow="ALWAYS">
+                    <GridPane fx:id="pipelineGrid" styleClass="pipeline-grid" hgap="2" vgap="1">
+                        <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
+                    </GridPane>
+                </ScrollPane>
+
+                <!-- Stage legend row -->
+                <HBox styleClass="stage-legend" spacing="12">
+                    <padding><Insets top="4" right="12" bottom="6" left="12"/></padding>
+                    <Label text="■ FXU" styleClass="legend-fxu"/>
+                    <Label text="■ FPU" styleClass="legend-fpu"/>
+                    <Label text="■ Branch" styleClass="legend-branch"/>
+                    <Label text="■ Load/Store" styleClass="legend-load"/>
+                    <Label text="■ NOP" styleClass="legend-nop"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label text="■ Structural" styleClass="legend-stall-struct"/>
+                    <Label text="■ Data" styleClass="legend-stall-data"/>
+                    <Label text="■ Control" styleClass="legend-stall-ctrl"/>
+                </HBox>
+            </VBox>
+
+            <!-- ── RIGHT SPLIT: Analytics ── -->
+            <VBox styleClass="analytics-panel" spacing="8" SplitPane.resizableWithParent="false">
+                <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
+
+                <Label text="ANALYTICS" styleClass="panel-header"/>
+                <Separator/>
+
+                <!-- Live IPC chart -->
+                <Label text="IPC Over Time" styleClass="chart-label"/>
+                <LineChart fx:id="ipcChart" styleClass="rsmt-chart" prefHeight="150" animated="false" createSymbols="false" legendVisible="false" VBox.vgrow="ALWAYS">
+                    <xAxis><NumberAxis label="" animated="false" forceZeroInRange="false"/></xAxis>
+                    <yAxis><NumberAxis label="IPC" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
+                </LineChart>
+
+                <!-- Cycles bar chart -->
+                <Label text="Cycles: SMT-ON vs SMT-OFF" styleClass="chart-label"/>
+                <BarChart fx:id="cyclesChart" styleClass="rsmt-chart" prefHeight="120" animated="false" legendVisible="true" VBox.vgrow="ALWAYS">
+                    <xAxis><CategoryAxis animated="false"/></xAxis>
+                    <yAxis><NumberAxis label="Cycles" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
+                </BarChart>
+
+                <!-- Unit utilization -->
+                <Label text="Unit Utilization" styleClass="chart-label"/>
+                <BarChart fx:id="utilChart" styleClass="rsmt-chart" prefHeight="140" animated="false" legendVisible="false" VBox.vgrow="ALWAYS">
+                    <xAxis><CategoryAxis animated="false"/></xAxis>
+                    <yAxis><NumberAxis animated="false" forceZeroInRange="true" lowerBound="0" upperBound="100"/></yAxis>
+                </BarChart>
+
+                <!-- Stall breakdown -->
+                <Label text="Stall Breakdown" styleClass="chart-label"/>
+                <BarChart fx:id="stallChart" styleClass="rsmt-chart" prefHeight="120" animated="false" legendVisible="false" VBox.vgrow="ALWAYS">
+                    <xAxis><CategoryAxis animated="false"/></xAxis>
+                    <yAxis><NumberAxis label="Cycles" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
+                </BarChart>
+
+            </VBox>
+        </SplitPane>
     </center>
-
-    <!-- ═══════════════════════  RIGHT — Analytics  ═══════════════════════ -->
-    <right>
-        <VBox styleClass="analytics-panel" spacing="10" minWidth="300" maxWidth="300">
-            <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
-
-            <Label text="ANALYTICS" styleClass="panel-header"/>
-            <Separator/>
-
-            <!-- Live IPC chart -->
-            <Label text="IPC Over Time" styleClass="chart-label"/>
-            <LineChart fx:id="ipcChart" styleClass="rsmt-chart" prefHeight="160" animated="false" createSymbols="false" legendVisible="false">
-                <xAxis><NumberAxis label="" animated="false" forceZeroInRange="false"/></xAxis>
-                <yAxis><NumberAxis label="IPC" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
-            </LineChart>
-
-            <!-- Cycles bar chart -->
-            <Label text="Cycles: SMT-ON vs SMT-OFF" styleClass="chart-label"/>
-            <BarChart fx:id="cyclesChart" styleClass="rsmt-chart" prefHeight="130" animated="false" legendVisible="true">
-                <xAxis><CategoryAxis animated="false"/></xAxis>
-                <yAxis><NumberAxis label="Cycles" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
-            </BarChart>
-
-            <!-- Unit utilization -->
-            <Label text="Unit Utilization" styleClass="chart-label"/>
-            <BarChart fx:id="utilChart" styleClass="rsmt-chart" prefHeight="150" animated="false" legendVisible="false">
-                <xAxis><CategoryAxis animated="false"/></xAxis>
-                <yAxis><NumberAxis animated="false" forceZeroInRange="true" lowerBound="0" upperBound="100"/></yAxis>
-            </BarChart>
-
-            <!-- Stall breakdown -->
-            <Label text="Stall Breakdown" styleClass="chart-label"/>
-            <BarChart fx:id="stallChart" styleClass="rsmt-chart" prefHeight="130" animated="false" legendVisible="false">
-                <xAxis><CategoryAxis animated="false"/></xAxis>
-                <yAxis><NumberAxis label="Cycles" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
-            </BarChart>
-
-        </VBox>
-    </right>
 
 </BorderPane>
