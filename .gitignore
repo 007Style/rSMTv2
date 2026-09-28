@@ -1,2 +1,14 @@
-*.class
+# Maven
+target/
+dependency-reduced-pom.xml
+
+# IDE
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+nbproject/private/
+
+# OS
 .DS_Store
