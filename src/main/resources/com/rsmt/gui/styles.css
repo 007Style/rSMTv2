@@ -81,6 +81,18 @@
     -fx-border-width: 0 0 0 2;
 }
 
+.mix-hint-label {
+    -fx-text-fill: #4a5568;
+    -fx-font-size: 9px;
+    -fx-font-style: italic;
+}
+
+.nop-remainder-label {
+    -fx-text-fill: #666688;
+    -fx-font-size: 10px;
+    -fx-padding: 2 0 0 0;
+}
+
 .panel-header {
     -fx-text-fill: #00d4aa;
     -fx-font-size: 10px;

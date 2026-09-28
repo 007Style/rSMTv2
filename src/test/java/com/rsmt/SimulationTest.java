@@ -26,10 +26,21 @@ class SimulationTest {
 
     @Test
     void simulationConfig_rejectsInvalidPercent() {
+        // percentFxu > 100
         assertThrows(IllegalArgumentException.class,
-                () -> new SimulationConfig(100, 0, 101, 20, 50, 20, 5, 6, 4, 3));
+                () -> new SimulationConfig(100, 0, 101, 0, 0, 0, 50, 20, 5, 6, 4, 3));
+        // percentLsu negative
         assertThrows(IllegalArgumentException.class,
-                () -> new SimulationConfig(100, 0, 50, -1, 50, 20, 5, 6, 4, 3));
+                () -> new SimulationConfig(100, 0, 50, 0, 0, -1, 50, 20, 5, 6, 4, 3));
+        // sum > 100
+        assertThrows(IllegalArgumentException.class,
+                () -> new SimulationConfig(100, 0, 60, 20, 15, 10, 50, 20, 5, 6, 4, 3));
+    }
+
+    @Test
+    void simulationConfig_percentNop() {
+        SimulationConfig c = new SimulationConfig(100, 0, 50, 15, 10, 15, 50, 20, 5, 6, 4, 3);
+        assertEquals(10, c.percentNop());
     }
 
     @Test
@@ -46,16 +57,46 @@ class SimulationTest {
 
     @Test
     void generator_correctFxuRatio() {
-        SimulationConfig config = new SimulationConfig(1000, 0, 50, 0, 50, 20, 5, 6, 4, 3);
+        // 50% FXU, nothing else → ~50% FXU out of 1000
+        SimulationConfig config = new SimulationConfig(1000, 0, 50, 0, 0, 0, 50, 20, 5, 6, 4, 3);
         InstructionGenerator gen = new InstructionGenerator(SEED);
         List<Instruction> insts = gen.generate(config);
 
         assertEquals(1000, insts.size());
-
         long fxuCount = insts.stream().filter(i -> i instanceof FxuInstruction).count();
-        // With 50% int target, expect roughly 400–600 FXU instructions out of 1000
-        assertTrue(fxuCount >= 350 && fxuCount <= 650,
+        assertTrue(fxuCount >= 400 && fxuCount <= 600,
                 "Expected ~50% FXU, got: " + fxuCount);
+    }
+
+    @Test
+    void generator_fpuInstructionsGenerated() {
+        // 0% FXU, 100% FPU → all FPU
+        SimulationConfig config = new SimulationConfig(200, 0, 0, 100, 0, 0, 50, 20, 5, 6, 4, 3);
+        InstructionGenerator gen = new InstructionGenerator(SEED);
+        List<Instruction> insts = gen.generate(config);
+
+        long fpuCount = insts.stream().filter(i -> i instanceof FpuInstruction).count();
+        assertEquals(200, fpuCount, "All 200 instructions should be FPU");
+    }
+
+    @Test
+    void generator_mixRatiosRespected() {
+        // 40% FXU, 20% FPU, 15% Branch, 15% LSU → 10% NOP
+        SimulationConfig config = new SimulationConfig(2000, 0, 40, 20, 15, 15, 50, 20, 5, 6, 4, 3);
+        InstructionGenerator gen = new InstructionGenerator(SEED);
+        List<Instruction> insts = gen.generate(config);
+
+        long fxu    = insts.stream().filter(i -> i instanceof FxuInstruction).count();
+        long fpu    = insts.stream().filter(i -> i instanceof FpuInstruction).count();
+        long branch = insts.stream().filter(i -> i instanceof BranchInstruction).count();
+        long lsu    = insts.stream().filter(i -> i instanceof LoadInstruction
+                                              || i instanceof StoreInstruction).count();
+
+        // Allow ±10% tolerance
+        assertTrue(fxu    >= 600 && fxu    <= 1000, "FXU ~40%, got: " + fxu);
+        assertTrue(fpu    >= 300 && fpu    <= 700,  "FPU ~20%, got: " + fpu);
+        assertTrue(branch >= 200 && branch <= 500,  "Branch ~15%, got: " + branch);
+        assertTrue(lsu    >= 200 && lsu    <= 500,  "LSU ~15%, got: " + lsu);
     }
 
     @Test
@@ -103,7 +144,7 @@ class SimulationTest {
     @Test
     void engine_smtOnFasterThanOff_atFullAvailability() {
         // 100% availability, 0% depends → rSMT should always fire → rCycles <= normCycles
-        SimulationConfig config = new SimulationConfig(200, 0, 80, 0, 100, 0, 5, 6, 4, 3);
+        SimulationConfig config = new SimulationConfig(200, 0, 80, 0, 0, 0, 100, 0, 5, 6, 4, 3);
         InstructionGenerator gen = new InstructionGenerator(SEED);
         List<Instruction> insts = gen.generate(config);
 
@@ -120,7 +161,7 @@ class SimulationTest {
 
     @Test
     void engine_smtInstructionCount_nonZeroAtHighAvailability() {
-        SimulationConfig config = new SimulationConfig(100, 0, 70, 0, 100, 0, 5, 6, 4, 3);
+        SimulationConfig config = new SimulationConfig(100, 0, 70, 0, 0, 0, 100, 0, 5, 6, 4, 3);
         InstructionGenerator gen = new InstructionGenerator(SEED);
         List<Instruction> insts = gen.generate(config);
 
@@ -134,7 +175,7 @@ class SimulationTest {
 
     @Test
     void engine_listenerReceivesTickEvents() {
-        SimulationConfig config = new SimulationConfig(20, 0, 50, 0, 50, 20, 5, 6, 4, 3);
+        SimulationConfig config = new SimulationConfig(20, 0, 50, 10, 10, 10, 50, 20, 5, 6, 4, 3);
         InstructionGenerator gen = new InstructionGenerator(SEED);
         List<Instruction> insts = gen.generate(config);
 
@@ -154,7 +195,7 @@ class SimulationTest {
     @Test
     void engine_dependsFixVerification() {
         // At 100% depends → slot 1 should always be blocked → smtInstructions == 0
-        SimulationConfig config = new SimulationConfig(100, 0, 80, 0, 100, 100, 5, 6, 4, 3);
+        SimulationConfig config = new SimulationConfig(100, 0, 80, 0, 0, 0, 100, 100, 5, 6, 4, 3);
         InstructionGenerator gen = new InstructionGenerator(SEED);
         List<Instruction> insts = gen.generate(config);
 
@@ -184,8 +225,7 @@ class SimulationTest {
 
     @Test
     void pipeline_controlStalls_nonZeroWithBranches() {
-        // 100% branch mix → every other instruction is a branch → many control stalls
-        SimulationConfig config = new SimulationConfig(50, 0, 0, 0, 50, 20, 5, 6, 4, 3);
+        SimulationConfig config = new SimulationConfig(50, 0, 0, 0, 0, 0, 50, 20, 5, 6, 4, 3);
         InstructionGenerator gen = new InstructionGenerator(SEED);
         // Force a stream with branches
         List<Instruction> insts = new ArrayList<>();
@@ -204,7 +244,7 @@ class SimulationTest {
     @Test
     void pipeline_dataStalls_nonZeroAtHighDependsPercent() {
         // 100% depends → every rSMT issue attempt is blocked by data hazard
-        SimulationConfig config = new SimulationConfig(100, 0, 80, 0, 100, 100, 5, 6, 4, 3);
+        SimulationConfig config = new SimulationConfig(100, 0, 80, 0, 0, 0, 100, 100, 5, 6, 4, 3);
         InstructionGenerator gen = new InstructionGenerator(SEED);
         List<Instruction> insts = gen.generate(config);
 
@@ -218,7 +258,7 @@ class SimulationTest {
 
     @Test
     void pipeline_ipcWithinExpectedRange() {
-        SimulationConfig config = new SimulationConfig(200, 0, 60, 10, 80, 10, 5, 6, 4, 3);
+        SimulationConfig config = new SimulationConfig(200, 0, 60, 10, 10, 10, 80, 10, 5, 6, 4, 3);
         InstructionGenerator gen = new InstructionGenerator(SEED);
         List<Instruction> insts = gen.generate(config);
 
@@ -233,7 +273,7 @@ class SimulationTest {
 
     @Test
     void pipeline_pipelineSnapshotContainsAllStages() {
-        SimulationConfig config = new SimulationConfig(10, 0, 50, 0, 50, 20, 5, 6, 4, 3);
+        SimulationConfig config = new SimulationConfig(10, 0, 50, 10, 10, 10, 50, 20, 5, 6, 4, 3);
         InstructionGenerator gen = new InstructionGenerator(SEED);
         List<Instruction> insts = gen.generate(config);
 

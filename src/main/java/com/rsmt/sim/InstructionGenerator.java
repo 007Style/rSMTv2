@@ -57,26 +57,32 @@ public final class InstructionGenerator {
     public List<Instruction> generate(SimulationConfig config) {
         List<Instruction> result = new ArrayList<>(config.numInstructions());
         System.out.println("(1) Generating Instructions... Number: " + config.numInstructions()
-                + "  %FXU: " + config.percentInt()
-                + "  %Load: " + config.percentLoad());
+                + "  %FXU: "    + config.percentFxu()
+                + "  %FPU: "    + config.percentFpu()
+                + "  %Branch: " + config.percentBranch()
+                + "  %LSU: "    + config.percentLsu()
+                + "  %NOP: "    + config.percentNop());
+
+        // Cumulative thresholds for a single roll in [0, 100]
+        // FXU: [0, fxu)  FPU: [fxu, fxu+fpu)  Branch: [...]  LSU: [...]  NOP: remainder
+        int thFxu    = config.percentFxu();
+        int thFpu    = thFxu    + config.percentFpu();
+        int thBranch = thFpu    + config.percentBranch();
+        int thLsu    = thBranch + config.percentLsu();
+        // [thLsu, 100] → NOP
 
         for (int i = 0; i < config.numInstructions(); i++) {
-            int roll = rng.nextInt(101);  // 0–100 inclusive
-
-            if (roll <= config.percentInt()) {
+            int roll = rng.nextInt(100);  // 0–99 inclusive (100 equal slots)
+            if (roll < thFxu) {
                 result.add(makeFxu(i, config.fxCycles()));
+            } else if (roll < thFpu) {
+                result.add(makeFpu(i, config.fpCycles()));
+            } else if (roll < thBranch) {
+                result.add(new BranchInstruction(i, 0, config.brCycles()));
+            } else if (roll < thLsu) {
+                result.add(makeLsu(i, config.lsuCycles()));
             } else {
-                int roll2 = rng.nextInt(101);
-                if (roll2 <= config.percentLoad()) {
-                    result.add(makeLsu(i, config.lsuCycles()));
-                } else {
-                    int roll3 = rng.nextInt(3); // 0=FPU, 1=Branch, 2=NOP
-                    result.add(switch (roll3) {
-                        case 0 -> makeFpu(i, config.fpCycles());
-                        case 1 -> new BranchInstruction(i, 0, config.brCycles());
-                        default -> new NopInstruction(i, 0, NOP_CYCLES);
-                    });
-                }
+                result.add(new NopInstruction(i, 0, NOP_CYCLES));
             }
         }
 

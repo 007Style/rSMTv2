@@ -64,27 +64,47 @@
 
     <!-- ═══════════════════════  RIGHT PANEL — Mix sliders + Latency  ═══════════════════════ -->
     <right>
-        <VBox styleClass="sliders-panel" spacing="10" minWidth="210" maxWidth="210">
+        <VBox styleClass="sliders-panel" spacing="8" minWidth="220" maxWidth="220">
             <padding><Insets top="16" right="12" bottom="16" left="12"/></padding>
 
             <Label text="WORKLOAD MIX" styleClass="panel-header"/>
+            <Label text="(sliders auto-adjust to sum to 100%)" styleClass="mix-hint-label"/>
             <Separator/>
 
-            <!-- Integer mix -->
+            <!-- FXU mix -->
             <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label fx:id="labelPercentInt" styleClass="param-label" HBox.hgrow="ALWAYS"/>
-                <Label fx:id="percentIntLabel" styleClass="slider-value-label" minWidth="30"/>
+                <Label text="% FXU (integer)" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="percentFxuLabel" styleClass="slider-value-label" minWidth="30"/>
             </HBox>
-            <Slider fx:id="percentIntSlider" min="0" max="100" value="60" showTickMarks="true"
+            <Slider fx:id="percentFxuSlider" min="0" max="100" showTickMarks="true"
                     showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
 
-            <!-- Load/Store mix -->
+            <!-- FPU mix -->
             <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label fx:id="labelPercentLoad" styleClass="param-label" HBox.hgrow="ALWAYS"/>
-                <Label fx:id="percentLoadLabel" styleClass="slider-value-label" minWidth="30"/>
+                <Label text="% FPU (float)" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="percentFpuLabel" styleClass="slider-value-label" minWidth="30"/>
             </HBox>
-            <Slider fx:id="percentLoadSlider" min="0" max="100" value="15" showTickMarks="true"
+            <Slider fx:id="percentFpuSlider" min="0" max="100" showTickMarks="true"
                     showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+
+            <!-- Branch mix -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="% Branch" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="percentBranchLabel" styleClass="slider-value-label" minWidth="30"/>
+            </HBox>
+            <Slider fx:id="percentBranchSlider" min="0" max="100" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+
+            <!-- LSU mix -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="% Load/Store" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="percentLsuLabel" styleClass="slider-value-label" minWidth="30"/>
+            </HBox>
+            <Slider fx:id="percentLsuSlider" min="0" max="100" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+
+            <!-- NOP remainder -->
+            <Label fx:id="nopRemainderLabel" styleClass="nop-remainder-label"/>
 
             <Separator/>
             <Label text="rSMT PARAMS" styleClass="panel-header"/>

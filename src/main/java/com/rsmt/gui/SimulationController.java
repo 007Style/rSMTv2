@@ -39,18 +39,26 @@ public class SimulationController implements Initializable {
     @FXML private Spinner<Integer>  fpCyclesSpinner;
     @FXML private Spinner<Integer>  brCyclesSpinner;
     @FXML private Spinner<Integer>  lsuCyclesSpinner;
-    @FXML private Slider            percentIntSlider;
-    @FXML private Slider            percentLoadSlider;
-    @FXML private Slider            rSmtAvailSlider;
-    @FXML private Slider            rSmtDependsSlider;
-    @FXML private Label             labelPercentInt;
-    @FXML private Label             labelPercentLoad;
-    @FXML private Label             labelRsmtAvail;
-    @FXML private Label             labelRsmtDepends;
-    @FXML private Label             percentIntLabel;
-    @FXML private Label             percentLoadLabel;
-    @FXML private Label             rSmtAvailLabel;
-    @FXML private Label             rSmtDependsLabel;
+
+    // Mix sliders (FXU / FPU / Branch / LSU — must sum ≤ 100; NOP = remainder)
+    @FXML private Slider  percentFxuSlider;
+    @FXML private Slider  percentFpuSlider;
+    @FXML private Slider  percentBranchSlider;
+    @FXML private Slider  percentLsuSlider;
+    @FXML private Label   percentFxuLabel;
+    @FXML private Label   percentFpuLabel;
+    @FXML private Label   percentBranchLabel;
+    @FXML private Label   percentLsuLabel;
+    @FXML private Label   nopRemainderLabel;
+
+    // rSMT param sliders
+    @FXML private Slider  rSmtAvailSlider;
+    @FXML private Slider  rSmtDependsSlider;
+    @FXML private Label   labelRsmtAvail;
+    @FXML private Label   labelRsmtDepends;
+    @FXML private Label   rSmtAvailLabel;
+    @FXML private Label   rSmtDependsLabel;
+
     @FXML private ComboBox<String>  speedCombo;
 
     // ─── Control buttons ─────────────────────────────────────────────────────
@@ -123,7 +131,7 @@ public class SimulationController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Spinners need programmatic ValueFactory
+        // Spinners — programmatic ValueFactory required
         numInstSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(10, 100_000, 500));
         rSmtDelaySpinner.setValueFactory(
@@ -139,16 +147,16 @@ public class SimulationController implements Initializable {
         lsuCyclesSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, InstructionGenerator.LSU_CYCLES));
 
-        // Static labels that contain % must be set in code (FXML treats % as resource key prefix)
-        labelPercentInt.setText("% Integer (FXU)");
-        labelPercentLoad.setText("% Load/Store");
+        // rSMT param labels contain % — must be set in code (FXML treats % as resource key prefix)
         labelRsmtAvail.setText("% rSMT Availability");
         labelRsmtDepends.setText("% Data Dependency");
 
         // PowerPC 600-style stage header
         pipelineHeaderLabel.setText(STAGE_LABEL);
 
-        bindSliderLabels();
+        initMixSliders();
+        bindPct(rSmtAvailSlider,   rSmtAvailLabel);
+        bindPct(rSmtDependsSlider, rSmtDependsLabel);
         initSpeedCombo();
         initCharts();
         initPipelineGridHeaders(true);
@@ -158,16 +166,105 @@ public class SimulationController implements Initializable {
         });
     }
 
-    private void bindSliderLabels() {
-        bindPct(percentIntSlider,  percentIntLabel);
-        bindPct(percentLoadSlider, percentLoadLabel);
-        bindPct(rSmtAvailSlider,   rSmtAvailLabel);
-        bindPct(rSmtDependsSlider, rSmtDependsLabel);
+    /**
+     * Sets up the 4 mix sliders with mutual constraint: FXU + FPU + Branch + LSU ≤ 100.
+     *
+     * <p>When the user moves slider A up, the remaining budget (100 − A) is distributed
+     * proportionally across the other three. Each slider is protected from going below 0.
+     * NOP remainder = 100 − sum, displayed as a read-only label.</p>
+     *
+     * <p>Initial values: FXU=50, FPU=15, Branch=10, LSU=15 → NOP=10.</p>
+     */
+    private void initMixSliders() {
+        // Set initial values
+        percentFxuSlider.setValue(50);
+        percentFpuSlider.setValue(15);
+        percentBranchSlider.setValue(10);
+        percentLsuSlider.setValue(15);
+
+        // Collect into array for generic handling
+        Slider[] mixSliders = {percentFxuSlider, percentFpuSlider, percentBranchSlider, percentLsuSlider};
+        Label[]  mixLabels  = {percentFxuLabel,  percentFpuLabel,  percentBranchLabel,  percentLsuLabel};
+
+        // Initial label text
+        for (int i = 0; i < mixSliders.length; i++) {
+            mixLabels[i].setText((int) mixSliders[i].getValue() + "%");
+        }
+        updateNopLabel();
+
+        // Attach mutual-adjustment listeners
+        for (int i = 0; i < mixSliders.length; i++) {
+            final int idx = i;
+            mixSliders[idx].valueProperty().addListener((obs, oldVal, newVal) -> {
+                // Snap to integer
+                int newInt = (int) Math.round(newVal.doubleValue());
+                mixLabels[idx].setText(newInt + "%");
+
+                // How much budget is left for the other three sliders?
+                int budget = 100 - newInt;
+                if (budget < 0) {
+                    // Clamp the moved slider itself
+                    mixSliders[idx].setValue(100);
+                    return;
+                }
+
+                // Sum of the other three current values
+                int otherSum = 0;
+                for (int j = 0; j < mixSliders.length; j++) {
+                    if (j != idx) otherSum += (int) Math.round(mixSliders[j].getValue());
+                }
+
+                if (otherSum > budget) {
+                    // Need to trim. Distribute reduction proportionally, largest-first to avoid rounding drift.
+                    int excess = otherSum - budget;
+                    // Build sorted list of (index, value) for the other sliders, descending by value
+                    List<int[]> others = new ArrayList<>();
+                    for (int j = 0; j < mixSliders.length; j++) {
+                        if (j != idx) others.add(new int[]{j, (int) Math.round(mixSliders[j].getValue())});
+                    }
+                    others.sort((a, b) -> b[1] - a[1]);
+
+                    // Trim proportionally: subtract from largest first
+                    for (int[] entry : others) {
+                        if (excess <= 0) break;
+                        int canTrim = Math.min(entry[1], excess);
+                        entry[1] -= canTrim;
+                        excess   -= canTrim;
+                    }
+
+                    // Apply the adjusted values — suppress re-entrant listeners with a flag
+                    adjusting = true;
+                    try {
+                        for (int[] entry : others) {
+                            mixSliders[entry[0]].setValue(entry[1]);
+                            mixLabels[entry[0]].setText(entry[1] + "%");
+                        }
+                    } finally {
+                        adjusting = false;
+                    }
+                }
+
+                updateNopLabel();
+            });
+        }
+    }
+
+    /** Re-entrancy guard — prevents slider listeners from triggering each other infinitely. */
+    private boolean adjusting = false;
+
+    private void updateNopLabel() {
+        int sum = (int) Math.round(percentFxuSlider.getValue())
+                + (int) Math.round(percentFpuSlider.getValue())
+                + (int) Math.round(percentBranchSlider.getValue())
+                + (int) Math.round(percentLsuSlider.getValue());
+        nopRemainderLabel.setText("NOP (remainder): " + (100 - sum) + "%");
     }
 
     private void bindPct(Slider s, Label l) {
         l.setText((int) s.getValue() + "%");
-        s.valueProperty().addListener((obs, o, v) -> l.setText(v.intValue() + "%"));
+        s.valueProperty().addListener((obs, o, v) -> {
+            if (!adjusting) l.setText(v.intValue() + "%");
+        });
     }
 
     private void initSpeedCombo() {
@@ -512,8 +609,10 @@ public class SimulationController implements Initializable {
         return new SimulationConfig(
                 numInstSpinner.getValue(),
                 rSmtDelaySpinner.getValue(),
-                (int) percentIntSlider.getValue(),
-                (int) percentLoadSlider.getValue(),
+                (int) Math.round(percentFxuSlider.getValue()),
+                (int) Math.round(percentFpuSlider.getValue()),
+                (int) Math.round(percentBranchSlider.getValue()),
+                (int) Math.round(percentLsuSlider.getValue()),
                 (int) rSmtAvailSlider.getValue(),
                 (int) rSmtDependsSlider.getValue(),
                 fxCyclesSpinner.getValue(),
