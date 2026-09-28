@@ -35,6 +35,10 @@ public class SimulationController implements Initializable {
     // ─── Config controls ─────────────────────────────────────────────────────
     @FXML private Spinner<Integer>  numInstSpinner;
     @FXML private Spinner<Integer>  rSmtDelaySpinner;
+    @FXML private Spinner<Integer>  fxCyclesSpinner;
+    @FXML private Spinner<Integer>  fpCyclesSpinner;
+    @FXML private Spinner<Integer>  brCyclesSpinner;
+    @FXML private Spinner<Integer>  lsuCyclesSpinner;
     @FXML private Slider            percentIntSlider;
     @FXML private Slider            percentLoadSlider;
     @FXML private Slider            rSmtAvailSlider;
@@ -124,6 +128,16 @@ public class SimulationController implements Initializable {
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(10, 100_000, 500));
         rSmtDelaySpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 0));
+
+        // Latency spinners — defaults match InstructionGenerator constants
+        fxCyclesSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, InstructionGenerator.FX_CYCLES));
+        fpCyclesSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, InstructionGenerator.FP_CYCLES));
+        brCyclesSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, InstructionGenerator.BR_CYCLES));
+        lsuCyclesSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, InstructionGenerator.LSU_CYCLES));
 
         // Static labels that contain % must be set in code (FXML treats % as resource key prefix)
         labelPercentInt.setText("% Integer (FXU)");
@@ -501,7 +515,11 @@ public class SimulationController implements Initializable {
                 (int) percentIntSlider.getValue(),
                 (int) percentLoadSlider.getValue(),
                 (int) rSmtAvailSlider.getValue(),
-                (int) rSmtDependsSlider.getValue()
+                (int) rSmtDependsSlider.getValue(),
+                fxCyclesSpinner.getValue(),
+                fpCyclesSpinner.getValue(),
+                brCyclesSpinner.getValue(),
+                lsuCyclesSpinner.getValue()
         );
     }
 

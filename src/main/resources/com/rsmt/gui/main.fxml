@@ -62,9 +62,9 @@
         </VBox>
     </left>
 
-    <!-- ═══════════════════════  RIGHT PANEL — Mix sliders  ═══════════════════════ -->
+    <!-- ═══════════════════════  RIGHT PANEL — Mix sliders + Latency  ═══════════════════════ -->
     <right>
-        <VBox styleClass="sliders-panel" spacing="10" minWidth="200" maxWidth="200">
+        <VBox styleClass="sliders-panel" spacing="10" minWidth="210" maxWidth="210">
             <padding><Insets top="16" right="12" bottom="16" left="12"/></padding>
 
             <Label text="WORKLOAD MIX" styleClass="panel-header"/>
@@ -105,6 +105,34 @@
             </HBox>
             <Slider fx:id="rSmtDependsSlider" min="0" max="100" value="20" showTickMarks="true"
                     showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+
+            <Separator/>
+            <Label text="LATENCY (cycles)" styleClass="panel-header"/>
+            <Separator/>
+
+            <!-- FXU latency -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="FXU cycles" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Spinner fx:id="fxCyclesSpinner" editable="true" styleClass="param-spinner" minWidth="60" maxWidth="60"/>
+            </HBox>
+
+            <!-- FPU latency -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="FPU cycles" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Spinner fx:id="fpCyclesSpinner" editable="true" styleClass="param-spinner" minWidth="60" maxWidth="60"/>
+            </HBox>
+
+            <!-- Branch latency -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="Branch cycles" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Spinner fx:id="brCyclesSpinner" editable="true" styleClass="param-spinner" minWidth="60" maxWidth="60"/>
+            </HBox>
+
+            <!-- LSU latency -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label text="LSU cycles" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Spinner fx:id="lsuCyclesSpinner" editable="true" styleClass="param-spinner" minWidth="60" maxWidth="60"/>
+            </HBox>
 
         </VBox>
     </right>

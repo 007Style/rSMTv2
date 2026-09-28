@@ -21,7 +21,7 @@ public class MainApp extends Application {
         }
 
         FXMLLoader loader = new FXMLLoader(fxmlUrl);
-        Scene scene = new Scene(loader.load(), 1400, 780);
+        Scene scene = new Scene(loader.load(), 1400, 880);
 
         // Load dark theme CSS
         URL cssUrl = getClass().getResource("styles.css");
@@ -32,7 +32,7 @@ public class MainApp extends Application {
         stage.setTitle("rSMTv2 — Reverse SMT Processor Simulator");
         stage.setScene(scene);
         stage.setMinWidth(1100);
-        stage.setMinHeight(650);
+        stage.setMinHeight(750);
         stage.show();
     }
 

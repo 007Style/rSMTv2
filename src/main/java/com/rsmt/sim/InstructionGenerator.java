@@ -64,16 +64,16 @@ public final class InstructionGenerator {
             int roll = rng.nextInt(101);  // 0–100 inclusive
 
             if (roll <= config.percentInt()) {
-                result.add(makeFxu(i));
+                result.add(makeFxu(i, config.fxCycles()));
             } else {
                 int roll2 = rng.nextInt(101);
                 if (roll2 <= config.percentLoad()) {
-                    result.add(makeLsu(i));
+                    result.add(makeLsu(i, config.lsuCycles()));
                 } else {
                     int roll3 = rng.nextInt(3); // 0=FPU, 1=Branch, 2=NOP
                     result.add(switch (roll3) {
-                        case 0 -> makeFpu(i);
-                        case 1 -> new BranchInstruction(i, 0, BR_CYCLES);
+                        case 0 -> makeFpu(i, config.fpCycles());
+                        case 1 -> new BranchInstruction(i, 0, config.brCycles());
                         default -> new NopInstruction(i, 0, NOP_CYCLES);
                     });
                 }
@@ -86,31 +86,31 @@ public final class InstructionGenerator {
 
     // ─── Factory helpers ─────────────────────────────────────────────────────
 
-    private FxuInstruction makeFxu(int order) {
+    private FxuInstruction makeFxu(int order, int latency) {
         int opIndex = rng.nextInt(4); // 0–3
         int op1 = rng.nextInt();
         int op2 = rng.nextInt();
         // Guard against division by zero for div
         if (opIndex == DIV && op2 == 0) op2 = 1;
-        return new FxuInstruction(order, 0, FX_CYCLES, op1, op2, opIndex, 0);
+        return new FxuInstruction(order, 0, latency, op1, op2, opIndex, 0);
     }
 
-    private FpuInstruction makeFpu(int order) {
+    private FpuInstruction makeFpu(int order, int latency) {
         int opIndex = rng.nextInt(4) + 4; // 4–7
         double dop1 = rng.nextDouble();
         double dop2 = rng.nextDouble();
         // Guard against FP division by zero
         if (opIndex == FDIV && dop2 == 0.0) dop2 = 1.0;
-        return new FpuInstruction(order, 0, FP_CYCLES, dop1, dop2, opIndex, 0.0);
+        return new FpuInstruction(order, 0, latency, dop1, dop2, opIndex, 0.0);
     }
 
-    private Instruction makeLsu(int order) {
+    private Instruction makeLsu(int order, int latency) {
         boolean isStore = rng.nextBoolean();
         int address = rng.nextInt(65536); // 64K address space
         if (isStore) {
-            return new StoreInstruction(order, 0, LSU_CYCLES, address, rng.nextInt());
+            return new StoreInstruction(order, 0, latency, address, rng.nextInt());
         } else {
-            return new LoadInstruction(order, 0, LSU_CYCLES, address);
+            return new LoadInstruction(order, 0, latency, address);
         }
     }
 
