@@ -2,17 +2,24 @@ package com.rsmt.gui;
 
 import com.rsmt.core.*;
 import com.rsmt.sim.*;
+import javafx.animation.*;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.canvas.*;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.*;
@@ -651,555 +658,424 @@ public class SimulationController implements Initializable {
 
     @FXML
     private void onAbout() {
-        showWebDialog("About rSMTv2", 620, 540, buildAboutHtml());
+        showDialog("About rSMTv2", 620, 500, buildAboutPane());
     }
 
     @FXML
     private void onHelp() {
-        showWebDialog("rSMTv2 Help", 780, 700, buildHelpHtml());
+        showDialog("rSMTv2 — Help & Reference", 760, 680, buildHelpPane());
     }
 
-    private void showWebDialog(String title, double w, double h, String html) {
-        javafx.scene.web.WebView wv = new javafx.scene.web.WebView();
-        wv.getEngine().loadContent(html, "text/html");
-        wv.setPrefSize(w, h);
-        javafx.stage.Stage dialog = new javafx.stage.Stage();
+    private void showDialog(String title, double w, double h, javafx.scene.Parent root) {
+        Stage dialog = new Stage();
         dialog.setTitle(title);
-        dialog.initModality(javafx.stage.Modality.APPLICATION_MODAL);
-        dialog.setScene(new javafx.scene.Scene(wv, w, h));
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setScene(new javafx.scene.Scene(root, w, h));
         dialog.setResizable(true);
         dialog.show();
     }
 
-    // ─── About HTML ───────────────────────────────────────────────────────────
+    // ─── About pane (pure JavaFX, no WebView) ────────────────────────────────
 
-    private static String buildAboutHtml() {
-        return """
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body {
-    background: #0a0a1a;
-    color: #e6f1ff;
-    font-family: 'Menlo', 'Consolas', monospace;
-    overflow: hidden;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
+    private javafx.scene.Parent buildAboutPane() {
+        // ── Root: dark background ──────────────────────────────────────────────
+        StackPane root = new StackPane();
+        root.setStyle("-fx-background-color: #0a0a1a;");
 
-  /* ── Animated chip grid background ── */
-  canvas#chip { position:fixed; top:0; left:0; z-index:0; opacity:0.18; }
-
-  .content { position:relative; z-index:1; padding: 32px 40px; }
-
-  .chip-icon {
-    font-size: 64px;
-    animation: pulse 2s ease-in-out infinite;
-    display: block;
-    margin-bottom: 12px;
-  }
-  @keyframes pulse {
-    0%,100% { transform: scale(1);   opacity: 1;   }
-    50%      { transform: scale(1.1); opacity: 0.8; }
-  }
-
-  h1 {
-    font-size: 22px;
-    color: #00d4aa;
-    font-weight: bold;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-    animation: glow 3s ease-in-out infinite;
-  }
-  @keyframes glow {
-    0%,100% { text-shadow: 0 0 8px #00d4aa88; }
-    50%      { text-shadow: 0 0 24px #00d4aacc, 0 0 48px #00d4aa44; }
-  }
-
-  .patent {
-    font-size: 12px;
-    color: #4a90d9;
-    margin: 6px 0 20px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-
-  .tagline {
-    font-size: 15px;
-    color: #ccd6f6;
-    margin-bottom: 28px;
-    font-style: italic;
-  }
-  .tagline span { color: #00d4aa; font-style: normal; font-weight: bold; }
-
-  /* ── Signal line animation ── */
-  .signals {
-    display: flex;
-    gap: 6px;
-    justify-content: center;
-    margin-bottom: 24px;
-  }
-  .sig {
-    width: 40px; height: 3px;
-    border-radius: 2px;
-    background: #00d4aa;
-    animation: sig-flash 1.8s ease-in-out infinite;
-  }
-  .sig:nth-child(2) { animation-delay: 0.3s; background: #4488ff; }
-  .sig:nth-child(3) { animation-delay: 0.6s; background: #ffdd44; }
-  .sig:nth-child(4) { animation-delay: 0.9s; background: #ff6b6b; }
-  .sig:nth-child(5) { animation-delay: 1.2s; background: #44ddff; }
-  @keyframes sig-flash {
-    0%,100% { opacity: 0.25; transform: scaleX(1);   }
-    50%      { opacity: 1;    transform: scaleX(1.6); }
-  }
-
-  /* ── Pipeline animation ── */
-  .pipeline {
-    display: flex;
-    gap: 4px;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 28px;
-  }
-  .stage {
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    animation: stage-light 4s linear infinite;
-  }
-  .stage:nth-child(1) { background:#1a3a5a; color:#44aaff; animation-delay:0s; }
-  .stage:nth-child(2) { background:#1a3a5a; color:#44aaff; animation-delay:0.8s; }
-  .stage:nth-child(3) { background:#1a3a5a; color:#44aaff; animation-delay:1.6s; }
-  .stage:nth-child(4) { background:#1a3a5a; color:#44aaff; animation-delay:2.4s; }
-  .stage:nth-child(5) { background:#1a3a5a; color:#44aaff; animation-delay:3.2s; }
-  .arrow { color:#2a4a6a; font-size:12px; }
-  @keyframes stage-light {
-    0%,15%,100% { background:#1a3a5a; color:#44aaff; box-shadow:none; }
-    5%,10%      { background:#00d4aa; color:#0a0a1a;
-                  box-shadow: 0 0 14px #00d4aaaa; }
-  }
-
-  .version {
-    font-size: 10px;
-    color: #2a4a6a;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-  }
-</style>
-</head>
-<body>
-<canvas id="chip"></canvas>
-<div class="content">
-  <span class="chip-icon">⬛</span>
-  <h1>rSMTv2</h1>
-  <h1 style="font-size:14px; margin-top:2px;">IBM PowerPC Reverse Simultaneous Multithreading</h1>
-  <div class="patent">IBM Patent US8595468 &nbsp;·&nbsp; Filed 2009</div>
-
-  <div class="signals">
-    <div class="sig"></div>
-    <div class="sig"></div>
-    <div class="sig"></div>
-    <div class="sig"></div>
-    <div class="sig"></div>
-  </div>
-
-  <div class="pipeline">
-    <div class="stage">FETCH</div>
-    <div class="arrow">→</div>
-    <div class="stage">DISPATCH</div>
-    <div class="arrow">→</div>
-    <div class="stage">EXECUTE</div>
-    <div class="arrow">→</div>
-    <div class="stage">COMPLETE</div>
-    <div class="arrow">→</div>
-    <div class="stage">RETIRE</div>
-  </div>
-
-  <div class="tagline">
-    From the minds of <span>IBM Bob</span> &amp; <span>Daneyand</span>
-  </div>
-
-  <div class="version">Version 2.0 &nbsp;·&nbsp; Java 21 &nbsp;·&nbsp; JavaFX 21</div>
-</div>
-
-<script>
-  // Animated chip trace grid on canvas
-  var c = document.getElementById('chip');
-  var ctx = c.getContext('2d');
-  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
-  resize();
-
-  var nodes = [];
-  for (var i = 0; i < 60; i++) {
-    nodes.push({
-      x: Math.random() * c.width,
-      y: Math.random() * c.height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      r: Math.random() * 2 + 1
-    });
-  }
-
-  function draw() {
-    ctx.clearRect(0, 0, c.width, c.height);
-    // Trace lines between nearby nodes
-    for (var i = 0; i < nodes.length; i++) {
-      var n = nodes[i];
-      n.x += n.vx; n.y += n.vy;
-      if (n.x < 0 || n.x > c.width)  n.vx *= -1;
-      if (n.y < 0 || n.y > c.height) n.vy *= -1;
-      for (var j = i+1; j < nodes.length; j++) {
-        var m = nodes[j];
-        var dx = n.x - m.x, dy = n.y - m.y;
-        var dist = Math.sqrt(dx*dx + dy*dy);
-        if (dist < 110) {
-          ctx.beginPath();
-          ctx.moveTo(n.x, n.y);
-          // Right-angle trace style
-          ctx.lineTo(n.x, m.y);
-          ctx.lineTo(m.x, m.y);
-          ctx.strokeStyle = '#00d4aa';
-          ctx.lineWidth = 0.5;
-          ctx.globalAlpha = 1 - dist/110;
-          ctx.stroke();
-          ctx.globalAlpha = 1;
+        // ── Animated canvas (circuit traces) behind everything ─────────────────
+        Canvas canvas = new Canvas(620, 500);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        double[][] nodes = new double[60][4]; // x, y, vx, vy
+        Random rnd = new Random();
+        for (double[] n : nodes) {
+            n[0] = rnd.nextDouble() * 620; n[1] = rnd.nextDouble() * 500;
+            n[2] = (rnd.nextDouble() - 0.5) * 0.5;
+            n[3] = (rnd.nextDouble() - 0.5) * 0.5;
         }
-      }
-      // Node dot
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
-      ctx.fillStyle = '#00d4aa';
-      ctx.fill();
+        AnimationTimer chipAnim = new AnimationTimer() {
+            @Override public void handle(long now) {
+                gc.clearRect(0, 0, 620, 500);
+                for (double[] n : nodes) {
+                    n[0] += n[2]; n[1] += n[3];
+                    if (n[0] < 0 || n[0] > 620) n[2] *= -1;
+                    if (n[1] < 0 || n[1] > 500) n[3] *= -1;
+                    for (double[] m : nodes) {
+                        double dx = n[0] - m[0], dy = n[1] - m[1];
+                        double dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 110 && dist > 1) {
+                            gc.setStroke(Color.web("#00d4aa", (1 - dist / 110) * 0.25));
+                            gc.setLineWidth(0.6);
+                            gc.beginPath();
+                            gc.moveTo(n[0], n[1]);
+                            gc.lineTo(n[0], m[1]);
+                            gc.lineTo(m[0], m[1]);
+                            gc.stroke();
+                        }
+                    }
+                    gc.setFill(Color.web("#00d4aa", 0.35));
+                    gc.fillOval(n[0] - 2, n[1] - 2, 4, 4);
+                }
+            }
+        };
+        chipAnim.start();
+
+        // ── Foreground content ─────────────────────────────────────────────────
+        VBox content = new VBox(10);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(30));
+
+        // Chip emoji with pulse scale animation
+        Label chipLbl = new Label("⬛");
+        chipLbl.setFont(Font.font("System", 56));
+        ScaleTransition pulse = new ScaleTransition(Duration.seconds(2), chipLbl);
+        pulse.setFromX(1); pulse.setFromY(1);
+        pulse.setToX(1.12); pulse.setToY(1.12);
+        pulse.setAutoReverse(true); pulse.setCycleCount(Animation.INDEFINITE);
+        pulse.play();
+
+        // Title
+        Label title1 = styledLabel("rSMTv2", "#00d4aa", 22, true);
+        Label title2 = styledLabel("IBM PowerPC Reverse Simultaneous Multithreading", "#ccd6f6", 13, false);
+
+        // Glow fade on title1
+        FadeTransition glow = new FadeTransition(Duration.seconds(2.5), title1);
+        glow.setFromValue(0.7); glow.setToValue(1.0);
+        glow.setAutoReverse(true); glow.setCycleCount(Animation.INDEFINITE);
+        glow.play();
+
+        // Patent
+        Label patent = styledLabel("IBM Patent US8,595,468 B2  ·  Filed 2009", "#4a90d9", 11, false);
+
+        // Signal bars
+        HBox signals = new HBox(6);
+        signals.setAlignment(Pos.CENTER);
+        String[] sigColors = {"#00d4aa","#4488ff","#ffdd44","#ff6b6b","#44ddff"};
+        for (int i = 0; i < 5; i++) {
+            Region bar = new Region();
+            bar.setPrefSize(40, 4);
+            bar.setStyle("-fx-background-color: " + sigColors[i] + "; -fx-background-radius: 2;");
+            final double delay = i * 0.35;
+            ScaleTransition st = new ScaleTransition(Duration.seconds(1.8), bar);
+            st.setDelay(Duration.seconds(delay));
+            st.setFromX(1); st.setToX(1.7);
+            st.setAutoReverse(true); st.setCycleCount(Animation.INDEFINITE);
+            st.play();
+            FadeTransition ft = new FadeTransition(Duration.seconds(1.8), bar);
+            ft.setDelay(Duration.seconds(delay));
+            ft.setFromValue(0.2); ft.setToValue(1.0);
+            ft.setAutoReverse(true); ft.setCycleCount(Animation.INDEFINITE);
+            ft.play();
+            signals.getChildren().add(bar);
+        }
+
+        // Pipeline stage labels that light up in sequence
+        String[] stages = {"FETCH","DISPATCH","EXECUTE","COMPLETE","RETIRE"};
+        String[] arrows  = {"→","→","→","→"};
+        HBox pipeline = new HBox(4);
+        pipeline.setAlignment(Pos.CENTER);
+        List<Label> stageLabels = new ArrayList<>();
+        for (int i = 0; i < stages.length; i++) {
+            Label s = styledLabel(stages[i], "#44aaff", 10, true);
+            s.setStyle(s.getStyle()
+                + "-fx-background-color:#1a3a5a; -fx-background-radius:4;"
+                + "-fx-padding:4 8 4 8;");
+            stageLabels.add(s);
+            pipeline.getChildren().add(s);
+            if (i < arrows.length) {
+                pipeline.getChildren().add(styledLabel(arrows[i], "#2a4a6a", 12, false));
+            }
+        }
+        // Sequential stage highlight animation
+        int[] stageIdx = {0};
+        Timeline stageTl = new Timeline(new KeyFrame(Duration.seconds(0.9), e -> {
+            for (int i = 0; i < stageLabels.size(); i++) {
+                boolean active = (i == stageIdx[0]);
+                stageLabels.get(i).setStyle(
+                    "-fx-text-fill:" + (active ? "#0a0a1a" : "#44aaff") + ";"
+                    + "-fx-font-weight:bold; -fx-font-size:10px;"
+                    + "-fx-background-color:" + (active ? "#00d4aa" : "#1a3a5a") + ";"
+                    + "-fx-background-radius:4; -fx-padding:4 8 4 8;"
+                    + (active ? "-fx-effect:dropshadow(gaussian,#00d4aa,12,0.6,0,0);" : "")
+                );
+            }
+            stageIdx[0] = (stageIdx[0] + 1) % stageLabels.size();
+        }));
+        stageTl.setCycleCount(Animation.INDEFINITE);
+        stageTl.play();
+
+        // Tagline
+        Label tagline = styledLabel("From the minds of  IBM Bob  &  Daneyand", "#ccd6f6", 14, false);
+        tagline.setStyle(tagline.getStyle() + "-fx-font-style:italic;");
+        Label tagHighlight = styledLabel("IBM Bob  &  Daneyand", "#00d4aa", 14, true);
+
+        // Version
+        Label version = styledLabel("Version 2.0  ·  Java 21  ·  JavaFX 21", "#2a4a6a", 10, false);
+
+        content.getChildren().addAll(
+            chipLbl, title1, title2, patent,
+            new Region() {{ setPrefHeight(8); }},
+            signals,
+            new Region() {{ setPrefHeight(4); }},
+            pipeline,
+            new Region() {{ setPrefHeight(12); }},
+            tagline, tagHighlight,
+            new Region() {{ setPrefHeight(8); }},
+            version
+        );
+
+        root.getChildren().addAll(canvas, content);
+        return root;
     }
-    requestAnimationFrame(draw);
-  }
-  draw();
-</script>
-</body>
-</html>
-""";
+    // ─── Help pane (pure JavaFX, scrollable) ─────────────────────────────────
+
+    private javafx.scene.Parent buildHelpPane() {
+        VBox body = new VBox(0);
+        body.setStyle("-fx-background-color:#0d1117;");
+        body.setPadding(new Insets(24, 28, 36, 28));
+
+        // H1
+        body.getChildren().add(h1("rSMTv2 — Help & Reference"));
+        body.getChildren().add(separator());
+
+        // WHAT IS THIS
+        body.getChildren().add(h2("What is rSMTv2?"));
+        body.getChildren().add(para(
+            "rSMTv2 is an interactive demonstration of Reverse Simultaneous Multithreading (rSMT) " +
+            "— a technique invented at IBM and patented in 2009. Traditional SMT lets a single core " +
+            "run multiple threads. rSMT flips this: a single thread can dispatch instructions to " +
+            "execution units on a different physical core, borrowing idle capacity when latency and " +
+            "data-hazard conditions allow it."));
+        body.getChildren().add(para(
+            "This simulator models a PowerPC 600-style in-order pipeline with a Local Core (always " +
+            "active) and a Remote Core (the rSMT target, active when rSMT is ON). Watch instructions " +
+            "flow in real time and compare IPC and cycle counts with rSMT on vs. off."));
+
+        // THE PATENT
+        body.getChildren().add(h2("The Patent"));
+        body.getChildren().add(patentBox(
+            "IBM Patent US8,595,468 B2",
+            "\"Reverse Simultaneous Multi-Threading\" — IBM Corporation, filed 2009.\n" +
+            "A processor thread dispatches FXU/FPU ops to an idle execution unit on a sibling core, " +
+            "subject to inter-core latency and data-dependency constraints, increasing throughput " +
+            "without adding hardware threads or OS scheduling changes."));
+
+        // PIPELINE
+        body.getChildren().add(h2("Pipeline Model (PowerPC 600 Style)"));
+        body.getChildren().add(tableView(
+            new String[]{"Stage", "What happens"},
+            new String[][]{
+                {"FETCH",    "Instruction is pulled from the stream into the pipeline."},
+                {"DISPATCH", "Instruction is decoded and routed to the correct execution unit."},
+                {"EXECUTE",  "Unit processes the instruction for its full latency (FXU=5, FPU=6, Branch=4, LSU=3 cycles default)."},
+                {"COMPLETE", "Result written back; the unit slot is freed."},
+                {"RETIRE",   "Instruction architecturally committed and removed from pipeline."}
+            }));
+
+        // EXECUTION UNITS
+        body.getChildren().add(h2("Execution Units & Colours"));
+        body.getChildren().add(tableView(
+            new String[]{"Unit", "Instructions", "Latency", "Core"},
+            new String[][]{
+                {"FXU0",          "Integer: ADD, SUB, MUL, DIV", "5 cycles (default)", "Local"},
+                {"FXU1 (REMOTE)", "Integer rSMT offload",         "5 + rSMT Delay",     "Remote"},
+                {"FPU0",          "Float: fADD, fSUB, fMUL, fDIV","6 cycles (default)", "Local"},
+                {"FPU1 (REMOTE)", "Float rSMT offload",           "6 + rSMT Delay",     "Remote"},
+                {"Branch",        "Conditional branches",         "4 cycles (default)", "Local"},
+                {"LSU",           "Load / Store",                 "3 cycles (default)", "Local"},
+                {"NOP",           "No-operation (fills remainder %)", "0 cycles",       "—"}
+            }));
+
+        // STALLS
+        body.getChildren().add(h2("Stall Types"));
+        body.getChildren().add(tableView(
+            new String[]{"Stall", "Cell shows", "Cause"},
+            new String[][]{
+                {"Structural", "STALL (red)",   "Target unit busy — new instruction must wait."},
+                {"Data",       "DEP (yellow)",  "Read-after-write hazard blocks issue to remote FXU slot."},
+                {"Control",    "BR (blue)",     "Branch in-flight — Fetch stage frozen until branch retires."}
+            }));
+
+        // GUI REFERENCE
+        body.getChildren().add(h2("GUI Element Reference"));
+
+        body.getChildren().add(h3("Left Panel — Simulation Config"));
+        body.getChildren().add(tableView(
+            new String[]{"Control", "What it does"},
+            new String[][]{
+                {"Instructions",       "Total instructions to generate. More = longer run, smoother IPC curve."},
+                {"rSMT Delay (cycles)","Extra latency on FXU1/FPU1. Models the inter-core bus penalty. 0 = no overhead."},
+                {"% rSMT Availability","Probability the remote slot is free each cycle. 100% = always available."},
+                {"% Data Dependency",  "Probability a hazard blocks the rSMT issue. 100% = rSMT never fires."},
+                {"Animation Speed",    "Delay between clock ticks. Ludicrous ⚡ = full speed, no delay."},
+                {"rSMT ON toggle",     "Enable/disable rSMT mid-simulation. REMOTE CORE rows show/hide live."},
+                {"▶ Run",              "Generate instructions and start both SMT-ON and SMT-OFF passes."},
+                {"⏸ Pause / ▶ Resume","Freeze and unfreeze the simulation at any cycle."},
+                {"⟳ Reset",           "Stop the simulation, clear the pipeline grid and all charts."},
+                {"GAIN",              "Performance gain = (SMT-OFF cycles / SMT-ON cycles) × 100%. Above 100% = rSMT helped."}
+            }));
+
+        body.getChildren().add(h3("Right Panel — Workload Mix"));
+        body.getChildren().add(para(
+            "Four sliders control the exact percentage of each instruction type. They are mutually " +
+            "constrained — dragging one up trims the others (largest first) so the total never exceeds 100%. " +
+            "NOP fills whatever percentage is left over."));
+        body.getChildren().add(tableView(
+            new String[]{"Slider", "Effect"},
+            new String[][]{
+                {"% FXU (integer)", "Share of ADD/SUB/MUL/DIV. High values = more FXU congestion, more rSMT opportunity."},
+                {"% FPU (float)",   "Share of fADD/fSUB/fMUL/fDIV. FPU latency=6 so high FPU % = lots of structural stalls."},
+                {"% Branch",        "Share of branches. Each freezes Fetch for 4 cycles — high branch % hammers IPC."},
+                {"% Load/Store",    "Share of memory ops. LSU latency=3; back-to-back LSU causes stalls."}
+            }));
+
+        body.getChildren().add(h3("Right Panel — Latency (cycles)"));
+        body.getChildren().add(tableView(
+            new String[]{"Spinner", "Default", "Tip"},
+            new String[][]{
+                {"FXU cycles",    "5", "Lower = faster integer retire = less structural stall."},
+                {"FPU cycles",    "6", "Biggest impact when FPU % is high."},
+                {"Branch cycles", "4", "Reduce to simulate an early-resolving branch predictor."},
+                {"LSU cycles",    "3", "Increase to model cache misses."}
+            }));
+
+        body.getChildren().add(h3("Pipeline Grid (Centre)"));
+        body.getChildren().add(para(
+            "Each column = one clock cycle. Each row = one execution unit slot. The grid auto-scrolls " +
+            "right. LOCAL CORE rows are always visible. REMOTE CORE rows (FXU1, FPU1) appear only when " +
+            "rSMT is ON — cells have an orange border to highlight offloaded instructions."));
+
+        body.getChildren().add(h3("Bottom Charts"));
+        body.getChildren().add(tableView(
+            new String[]{"Chart", "What it shows"},
+            new String[][]{
+                {"IPC Over Time",       "Live IPC sampled every 5 ticks. Watch it stabilise as the pipeline fills."},
+                {"Cycles: SMT-ON vs OFF","Final cycle counts for both passes. Shorter SMT-ON bar = rSMT helped."},
+                {"Unit Utilization",    "% of cycles each unit was busy. Low FXU1 = rSMT conditions rarely met."},
+                {"Stall Breakdown",     "Total structural / data / control stall cycles across the run."}
+            }));
+
+        body.getChildren().add(tipBox(
+            "Pro tip: Set FXU=80%, rSMT Availability=100%, Data Dependency=0%, rSMT Delay=0 " +
+            "and watch GAIN soar. Then crank Data Dependency to 100% and watch it collapse to 100% " +
+            "(no benefit). That's the patent in action."));
+
+        ScrollPane scroll = new ScrollPane(body);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background-color:#0d1117; -fx-background:#0d1117;");
+        return scroll;
     }
 
-    // ─── Help HTML ────────────────────────────────────────────────────────────
+    // ─── Help/About styling helpers ───────────────────────────────────────────
 
-    private static String buildHelpHtml() {
-        return """
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8"/>
-<style>
-  * { box-sizing: border-box; margin:0; padding:0; }
-  body {
-    background: #0d1117;
-    color: #c9d1d9;
-    font-family: -apple-system, 'Segoe UI', sans-serif;
-    font-size: 13px;
-    line-height: 1.7;
-    padding: 28px 32px 40px;
-  }
-  h1 {
-    color: #00d4aa;
-    font-size: 20px;
-    border-bottom: 2px solid #00d4aa44;
-    padding-bottom: 8px;
-    margin-bottom: 18px;
-    letter-spacing: 0.5px;
-  }
-  h2 {
-    color: #4488ff;
-    font-size: 14px;
-    font-weight: bold;
-    margin: 24px 0 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  h3 {
-    color: #00d4aa;
-    font-size: 12px;
-    font-weight: bold;
-    margin: 14px 0 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  p { margin-bottom: 10px; color: #b0bec5; }
-  strong { color: #e6f1ff; }
-  code {
-    background: #161b22;
-    color: #00d4aa;
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-family: 'Menlo', 'Consolas', monospace;
-    font-size: 11px;
-  }
-  .patent-box {
-    background: #0f3460;
-    border: 1px solid #4488ff44;
-    border-left: 3px solid #4488ff;
-    border-radius: 4px;
-    padding: 12px 16px;
-    margin: 12px 0;
-  }
-  .patent-box .num { color: #4488ff; font-weight: bold; font-size: 15px; }
-  .patent-box .desc { color: #8892b0; font-size: 12px; margin-top: 4px; }
+    private static Label styledLabel(String text, String color, double size, boolean bold) {
+        Label l = new Label(text);
+        l.setStyle("-fx-text-fill:" + color + "; -fx-font-size:" + size + "px;"
+                + (bold ? "-fx-font-weight:bold;" : ""));
+        return l;
+    }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 10px 0 16px;
-    font-size: 12px;
-  }
-  th {
-    background: #161b22;
-    color: #00d4aa;
-    text-align: left;
-    padding: 6px 10px;
-    border-bottom: 1px solid #00d4aa44;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  td {
-    padding: 5px 10px;
-    border-bottom: 1px solid #21262d;
-    color: #b0bec5;
-    vertical-align: top;
-  }
-  td:first-child { color: #e6f1ff; font-weight: bold; white-space: nowrap; }
-  tr:hover td { background: #161b22; }
+    private static Label h1(String text) {
+        Label l = styledLabel(text, "#00d4aa", 18, true);
+        l.setPadding(new Insets(0, 0, 6, 0));
+        return l;
+    }
 
-  .tag {
-    display: inline-block;
-    padding: 1px 7px;
-    border-radius: 10px;
-    font-size: 10px;
-    font-weight: bold;
-    margin-right: 4px;
-  }
-  .tag-fxu    { background:#1a4a2a; color:#1aff7a; }
-  .tag-fpu    { background:#1a2a4a; color:#4488ff; }
-  .tag-branch { background:#4a3a1a; color:#ffdd44; }
-  .tag-lsu    { background:#1a3a4a; color:#44ddff; }
-  .tag-nop    { background:#2a2a3a; color:#888899; }
-  .tag-stall  { background:#3a1a1a; color:#ff9999; }
-  .tag-remote { background:#3a2a1a; color:#ff9944; }
+    private static Label h2(String text) {
+        Label l = styledLabel(text.toUpperCase(), "#4488ff", 12, true);
+        l.setPadding(new Insets(16, 0, 6, 0));
+        return l;
+    }
 
-  .tip {
-    background: #1a2a1a;
-    border-left: 3px solid #00d4aa;
-    padding: 8px 12px;
-    border-radius: 0 4px 4px 0;
-    margin: 10px 0;
-    font-size: 12px;
-    color: #8892b0;
-  }
-  .tip strong { color: #00d4aa; }
+    private static Label h3(String text) {
+        Label l = styledLabel(text.toUpperCase(), "#00d4aa", 11, true);
+        l.setPadding(new Insets(10, 0, 4, 0));
+        return l;
+    }
 
-  .section { margin-bottom: 4px; }
-</style>
-</head>
-<body>
+    private static Label para(String text) {
+        Label l = new Label(text);
+        l.setWrapText(true);
+        l.setStyle("-fx-text-fill:#b0bec5; -fx-font-size:12px;");
+        l.setPadding(new Insets(0, 0, 8, 0));
+        return l;
+    }
 
-<h1>rSMTv2 — Help &amp; Reference</h1>
+    private static Region separator() {
+        Region r = new Region();
+        r.setPrefHeight(1);
+        r.setStyle("-fx-background-color:#00d4aa44;");
+        VBox.setMargin(r, new Insets(4, 0, 12, 0));
+        return r;
+    }
 
-<!-- ── WHAT IS THIS ── -->
-<h2>What is rSMTv2?</h2>
-<p>
-  <strong>rSMTv2</strong> is an interactive demonstration of <strong>Reverse Simultaneous
-  Multithreading (rSMT)</strong> — a technique invented at IBM and patented in 2009.
-  Traditional SMT lets a single physical core run multiple threads by sharing its
-  execution units. <strong>rSMT flips this</strong>: a single thread can dispatch
-  instructions to execution units on a <em>different</em> physical core, borrowing
-  idle capacity across cores when latency and data-hazard conditions allow it.
-</p>
-<p>
-  This simulator models a <strong>PowerPC 600-style in-order pipeline</strong> with two
-  execution paths — a <em>Local Core</em> (always active) and a <em>Remote Core</em>
-  (the rSMT target, active only when rSMT is ON and conditions are met). Watch
-  instructions flow through the pipeline in real time and compare IPC, stall counts,
-  and cycle counts with rSMT on vs. off.
-</p>
+    private static VBox patentBox(String title, String body) {
+        VBox box = new VBox(4);
+        box.setStyle("-fx-background-color:#0f3460; -fx-border-color:#4488ff44;"
+                + "-fx-border-width:0 0 0 3; -fx-border-insets:0 0 0 0;"
+                + "-fx-background-radius:4; -fx-border-radius:4;");
+        box.setPadding(new Insets(10, 14, 10, 14));
+        VBox.setMargin(box, new Insets(4, 0, 10, 0));
+        Label t = styledLabel(title, "#4488ff", 13, true);
+        Label b = new Label(body);
+        b.setWrapText(true);
+        b.setStyle("-fx-text-fill:#8892b0; -fx-font-size:11px;");
+        box.getChildren().addAll(t, b);
+        return box;
+    }
 
-<!-- ── THE PATENT ── -->
-<h2>The Patent</h2>
-<div class="patent-box">
-  <div class="num">IBM Patent US8,595,468 B2</div>
-  <div class="desc">
-    "Reverse Simultaneous Multi-Threading" — IBM Corporation, filed 2009.<br/>
-    Inventors describe a method by which a processor thread may dispatch fixed-point
-    and floating-point operations to an otherwise-idle execution unit on a sibling
-    core, subject to inter-core latency and data-dependency constraints, thereby
-    increasing effective instruction throughput without adding hardware threads.
-  </div>
-</div>
-<p>
-  The key insight: modern out-of-order cores often have FXU and FPU slots sitting
-  idle while the primary thread is stalled on a long-latency load or branch. rSMT
-  harvests that slack for the benefit of the <em>same</em> thread — no OS scheduling
-  changes required.
-</p>
+    private static VBox tipBox(String text) {
+        VBox box = new VBox();
+        box.setStyle("-fx-background-color:#1a2a1a; -fx-border-color:#00d4aa;"
+                + "-fx-border-width:0 0 0 3; -fx-background-radius:4;");
+        box.setPadding(new Insets(8, 12, 8, 12));
+        VBox.setMargin(box, new Insets(12, 0, 0, 0));
+        Label l = new Label(text);
+        l.setWrapText(true);
+        l.setStyle("-fx-text-fill:#8892b0; -fx-font-size:11px;");
+        box.getChildren().add(l);
+        return box;
+    }
 
-<!-- ── PIPELINE ── -->
-<h2>Pipeline Model (PowerPC 600 Style)</h2>
-<p>Every instruction travels through five named stages:</p>
-<table>
-  <tr><th>Stage</th><th>What happens</th></tr>
-  <tr><td>FETCH</td><td>Instruction is pulled from the stream into the pipeline.</td></tr>
-  <tr><td>DISPATCH</td><td>Instruction is decoded and routed to the correct execution unit queue.</td></tr>
-  <tr><td>EXECUTE</td><td>The execution unit processes the instruction for its full latency (FXU=5, FPU=6, Branch=4, LSU=3 cycles by default).</td></tr>
-  <tr><td>COMPLETE</td><td>Result is written back; the unit slot is freed.</td></tr>
-  <tr><td>RETIRE</td><td>Instruction is architecturally committed and removed from the pipeline.</td></tr>
-</table>
-<p>
-  The simulator uses a <strong>single-issue in-order pipeline</strong>. rSMT adds a
-  second issue opportunity per cycle to the remote FXU and FPU slots.
-</p>
+    private static javafx.scene.Node tableView(String[] headers, String[][] rows) {
+        GridPane grid = new GridPane();
+        grid.setStyle("-fx-background-color:transparent;");
+        VBox.setMargin(grid, new Insets(0, 0, 10, 0));
 
-<!-- ── EXECUTION UNITS ── -->
-<h2>Execution Units &amp; Colours</h2>
-<table>
-  <tr><th>Unit</th><th>Instruction type</th><th>Latency</th><th>Core</th></tr>
-  <tr>
-    <td><span class="tag tag-fxu">FXU0</span></td>
-    <td>Integer: ADD, SUB, MUL, DIV</td>
-    <td>5 cycles (default)</td>
-    <td>Local</td>
-  </tr>
-  <tr>
-    <td><span class="tag tag-fxu">FXU1</span> <span class="tag tag-remote">REMOTE</span></td>
-    <td>Integer (rSMT offload)</td>
-    <td>5 + rSMT Delay</td>
-    <td>Remote</td>
-  </tr>
-  <tr>
-    <td><span class="tag tag-fpu">FPU0</span></td>
-    <td>Float: fADD, fSUB, fMUL, fDIV</td>
-    <td>6 cycles (default)</td>
-    <td>Local</td>
-  </tr>
-  <tr>
-    <td><span class="tag tag-fpu">FPU1</span> <span class="tag tag-remote">REMOTE</span></td>
-    <td>Float (rSMT offload)</td>
-    <td>6 + rSMT Delay</td>
-    <td>Remote</td>
-  </tr>
-  <tr>
-    <td><span class="tag tag-branch">Branch</span></td>
-    <td>Conditional branches</td>
-    <td>4 cycles (default)</td>
-    <td>Local</td>
-  </tr>
-  <tr>
-    <td><span class="tag tag-lsu">LSU</span></td>
-    <td>Load / Store</td>
-    <td>3 cycles (default)</td>
-    <td>Local</td>
-  </tr>
-  <tr>
-    <td><span class="tag tag-nop">NOP</span></td>
-    <td>No-operation (fills remainder %)</td>
-    <td>0 cycles</td>
-    <td>—</td>
-  </tr>
-</table>
+        // Header row
+        for (int c = 0; c < headers.length; c++) {
+            Label h = styledLabel(headers[c].toUpperCase(), "#00d4aa", 10, true);
+            h.setPadding(new Insets(4, 10, 4, 6));
+            h.setMaxWidth(Double.MAX_VALUE);
+            h.setStyle(h.getStyle() + "-fx-background-color:#161b22;"
+                    + "-fx-border-color:#00d4aa44; -fx-border-width:0 0 1 0;");
+            GridPane.setHgrow(h, Priority.ALWAYS);
+            grid.add(h, c, 0);
+        }
 
-<!-- ── STALLS ── -->
-<h2>Stall Types</h2>
-<table>
-  <tr><th>Stall</th><th>Colour</th><th>Cause</th></tr>
-  <tr>
-    <td>Structural</td>
-    <td><span class="tag tag-stall">STALL</span></td>
-    <td>The target execution unit is still busy with a previous instruction. The new instruction must wait.</td>
-  </tr>
-  <tr>
-    <td>Data</td>
-    <td><span class="tag" style="background:#3a2a00;color:#ffe699;">DEP</span></td>
-    <td>A data hazard (read-after-write dependency) prevents issuing to the remote FXU slot.</td>
-  </tr>
-  <tr>
-    <td>Control</td>
-    <td><span class="tag" style="background:#1a1a3a;color:#99b8ff;">BR</span></td>
-    <td>A branch is in-flight. The Fetch stage is frozen until the branch retires.</td>
-  </tr>
-</table>
+        // Data rows
+        for (int r = 0; r < rows.length; r++) {
+            String rowBg = (r % 2 == 0) ? "#0d1117" : "#111820";
+            for (int c = 0; c < rows[r].length; c++) {
+                Label cell = new Label(rows[r][c]);
+                cell.setWrapText(true);
+                cell.setPadding(new Insets(4, 10, 4, 6));
+                cell.setMaxWidth(Double.MAX_VALUE);
+                cell.setStyle("-fx-text-fill:" + (c == 0 ? "#e6f1ff" : "#b0bec5") + ";"
+                        + "-fx-font-size:11px;"
+                        + (c == 0 ? "-fx-font-weight:bold;" : "")
+                        + "-fx-background-color:" + rowBg + ";"
+                        + "-fx-border-color:#21262d; -fx-border-width:0 0 1 0;");
+                GridPane.setHgrow(cell, Priority.ALWAYS);
+                grid.add(cell, c, r + 1);
+            }
+        }
 
-<!-- ── GUI REFERENCE ── -->
-<h2>GUI Element Reference</h2>
-
-<h3>Left Panel — Simulation Config</h3>
-<table>
-  <tr><th>Control</th><th>What it does</th></tr>
-  <tr><td>Instructions</td><td>Total number of instructions to generate and simulate. More = longer run, smoother IPC curve.</td></tr>
-  <tr><td>rSMT Delay (cycles)</td><td>Extra latency added to remote-core execution (FXU1, FPU1). Models the real inter-core bus penalty. 0 = no overhead.</td></tr>
-  <tr><td><code>% rSMT Availability</code></td><td>Probability (0–100%) that the remote core slot is actually free each cycle. 100% = always available.</td></tr>
-  <tr><td><code>% Data Dependency</code></td><td>Probability that a data hazard blocks the rSMT issue attempt. 100% = always blocked (rSMT never fires).</td></tr>
-  <tr><td>Animation Speed</td><td>Delay between clock ticks. "Ludicrous ⚡" runs at full speed with no delay.</td></tr>
-  <tr><td>rSMT ON toggle</td><td>Enable or disable rSMT mid-simulation. The pipeline grid shows/hides the REMOTE CORE section dynamically.</td></tr>
-  <tr><td>▶ Run</td><td>Generate instructions and start the simulation. Runs SMT-ON pass, then SMT-OFF pass.</td></tr>
-  <tr><td>⏸ Pause / ▶ Resume</td><td>Freeze and unfreeze the simulation at any cycle.</td></tr>
-  <tr><td>⟳ Reset</td><td>Stop the simulation and clear the pipeline grid and all charts.</td></tr>
-  <tr><td>GAIN</td><td>Performance gain = (SMT-OFF cycles / SMT-ON cycles) × 100%. Values above 100% mean rSMT helped.</td></tr>
-</table>
-
-<h3>Right Panel — Workload Mix</h3>
-<p>Four sliders control the exact percentage of each instruction type generated.
-  They are <strong>mutually constrained</strong> — dragging one up automatically
-  trims the others (largest first) so the total never exceeds 100%. The
-  <strong>NOP remainder</strong> fills whatever percentage is left over.</p>
-<table>
-  <tr><th>Slider</th><th>Effect</th></tr>
-  <tr><td><code>% FXU (integer)</code></td><td>Share of integer ops (ADD/SUB/MUL/DIV). High values = more FXU congestion, more rSMT opportunities.</td></tr>
-  <tr><td><code>% FPU (float)</code></td><td>Share of floating-point ops. FPU has the longest latency (6 cycles), so high FPU = lots of structural stalls on FPU0.</td></tr>
-  <tr><td><code>% Branch</code></td><td>Share of branch ops. Each branch freezes Fetch for 4 cycles — high branch % hammers IPC.</td></tr>
-  <tr><td><code>% Load/Store</code></td><td>Share of memory ops. LSU has 3-cycle latency; shares one slot, so back-to-back LSU causes stalls.</td></tr>
-</table>
-
-<h3>Right Panel — Latency (cycles)</h3>
-<p>Override the default execution latency for each unit type. Changes take effect
-  on the next <strong>Run</strong>. Useful for modelling faster/slower hardware:</p>
-<table>
-  <tr><th>Spinner</th><th>Default</th><th>Tip</th></tr>
-  <tr><td>FXU cycles</td><td>5</td><td>Lower = integer ops retire faster = less structural stall on FXU0.</td></tr>
-  <tr><td>FPU cycles</td><td>6</td><td>The longest default. Reducing this has a big IPC impact when FPU % is high.</td></tr>
-  <tr><td>Branch cycles</td><td>4</td><td>Reduce to simulate a branch predictor that resolves early.</td></tr>
-  <tr><td>LSU cycles</td><td>3</td><td>Increase to model cache misses.</td></tr>
-</table>
-
-<h3>Pipeline Grid (Centre)</h3>
-<p>Each column is one clock cycle. Each row is one execution unit slot.
-  The grid auto-scrolls right as the simulation runs.</p>
-<div class="tip"><strong>LOCAL CORE</strong> rows are always visible.
-  <strong>REMOTE CORE</strong> rows (FXU1, FPU1) appear only when rSMT is ON —
-  cells have an orange border to make offloaded instructions immediately obvious.</div>
-
-<h3>Bottom Charts</h3>
-<table>
-  <tr><th>Chart</th><th>What it shows</th></tr>
-  <tr><td>IPC Over Time</td><td>Live instructions-per-cycle ratio, sampled every 5 ticks. Watch it stabilise as the pipeline fills.</td></tr>
-  <tr><td>Cycles: SMT-ON vs OFF</td><td>Final cycle counts for both passes. A shorter SMT-ON bar = rSMT helped.</td></tr>
-  <tr><td>Unit Utilization</td><td>Percentage of cycles each execution unit was busy. Low FXU1 utilization = rSMT conditions were rarely met.</td></tr>
-  <tr><td>Stall Breakdown</td><td>Total structural, data, and control stall cycles. Dominated by control stalls when branch % is high.</td></tr>
-</table>
-
-<div class="tip">
-  <strong>Pro tip:</strong> Set FXU=80%, rSMT Availability=100%, Data Dependency=0%,
-  rSMT Delay=0 and watch the GAIN soar. Then crank Data Dependency to 100% and
-  watch it collapse to 100% (no benefit). That's the patent in action.
-</div>
-
-</body>
-</html>
-""";
+        // Equal column widths
+        for (int c = 0; c < headers.length; c++) {
+            ColumnConstraints cc = new ColumnConstraints();
+            cc.setPercentWidth(100.0 / headers.length);
+            grid.getColumnConstraints().add(cc);
+        }
+        return grid;
     }
 }
