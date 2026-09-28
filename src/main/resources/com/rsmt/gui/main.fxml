@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.rsmt.gui.SimulationController"
+            styleClass="root-pane">
+
+    <!-- ═══════════════════════  TOP BAR  ═══════════════════════ -->
+    <top>
+        <HBox styleClass="top-bar" spacing="16" alignment="CENTER_LEFT">
+            <padding><Insets top="10" right="16" bottom="10" left="16"/></padding>
+            <Label text="rSMTv2" styleClass="title-label"/>
+            <Label text="Reverse SMT Processor Simulator" styleClass="subtitle-label"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Cycle:" styleClass="stat-label"/>
+            <Label fx:id="cycleCountLabel" text="0" styleClass="stat-value"/>
+            <Label text="IPC:" styleClass="stat-label"/>
+            <Label fx:id="ipcLabel" text="0.000" styleClass="stat-value"/>
+            <Label fx:id="smtStatusLabel" text="rSMT ON" styleClass="smt-on-label"/>
+        </HBox>
+    </top>
+
+    <!-- ═══════════════════════  LEFT PANEL — Config  ═══════════════════════ -->
+    <left>
+        <VBox styleClass="config-panel" spacing="12" minWidth="220" maxWidth="220">
+            <padding><Insets top="16" right="12" bottom="16" left="12"/></padding>
+
+            <Label text="SIMULATION CONFIG" styleClass="panel-header"/>
+            <Separator/>
+
+            <!-- Instruction count -->
+            <Label text="Instructions" styleClass="param-label"/>
+            <Spinner fx:id="numInstSpinner" editable="true" styleClass="param-spinner"/>
+
+            <!-- rSMT delay -->
+            <Label text="rSMT Delay (cycles)" styleClass="param-label"/>
+            <Spinner fx:id="rSmtDelaySpinner" editable="true" styleClass="param-spinner"/>
+
+            <!-- % Integer -->
+            <Label text="% Integer (FXU)" styleClass="param-label"/>
+            <Slider fx:id="percentIntSlider" min="0" max="100" value="60" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+            <Label fx:id="percentIntLabel" text="60%" styleClass="slider-value-label"/>
+
+            <!-- % Load/Store -->
+            <Label text="% Load/Store" styleClass="param-label"/>
+            <Slider fx:id="percentLoadSlider" min="0" max="100" value="15" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+            <Label fx:id="percentLoadLabel" text="15%" styleClass="slider-value-label"/>
+
+            <!-- % rSMT Availability -->
+            <Label text="% rSMT Availability" styleClass="param-label"/>
+            <Slider fx:id="rSmtAvailSlider" min="0" max="100" value="60" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+            <Label fx:id="rSmtAvailLabel" text="60%" styleClass="slider-value-label"/>
+
+            <!-- % Data Dependency -->
+            <Label text="% Data Dependency" styleClass="param-label"/>
+            <Slider fx:id="rSmtDependsSlider" min="0" max="100" value="20" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+            <Label fx:id="rSmtDependsLabel" text="20%" styleClass="slider-value-label"/>
+
+            <Separator/>
+            <Label text="ANIMATION SPEED" styleClass="panel-header"/>
+
+            <ComboBox fx:id="speedCombo" styleClass="param-spinner"/>
+
+            <Separator/>
+            <Label text="CONTROLS" styleClass="panel-header"/>
+
+            <ToggleButton fx:id="smtToggle" text="rSMT ON" selected="true" styleClass="smt-toggle"/>
+
+            <HBox spacing="8">
+                <Button fx:id="runButton"   text="▶  Run"   onAction="#onRun"   styleClass="run-button"   HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                <Button fx:id="pauseButton" text="⏸ Pause" onAction="#onPause" styleClass="pause-button" HBox.hgrow="ALWAYS" maxWidth="Infinity" disable="true"/>
+            </HBox>
+            <Button fx:id="resetButton" text="⟳  Reset" onAction="#onReset" styleClass="reset-button" maxWidth="Infinity"/>
+
+            <Separator/>
+            <Label text="GAIN" styleClass="panel-header"/>
+            <Label fx:id="gainLabel" text="—" styleClass="gain-label"/>
+
+        </VBox>
+    </left>
+
+    <!-- ═══════════════════════  CENTER — Pipeline Grid  ═══════════════════════ -->
+    <center>
+        <VBox styleClass="pipeline-panel" spacing="0">
+            <Label text="PIPELINE VIEW  (Fetch → Decode → Issue → Execute)" styleClass="panel-header"
+                   style="-fx-padding: 8 12 4 12;"/>
+            <Separator/>
+            <ScrollPane fx:id="pipelineScroll" fitToHeight="false" fitToWidth="false"
+                        hbarPolicy="ALWAYS" vbarPolicy="NEVER" styleClass="pipeline-scroll"
+                        VBox.vgrow="ALWAYS">
+                <GridPane fx:id="pipelineGrid" styleClass="pipeline-grid" hgap="2" vgap="1">
+                    <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
+                </GridPane>
+            </ScrollPane>
+
+            <!-- Stage legend row -->
+            <HBox styleClass="stage-legend" spacing="12">
+                <padding><Insets top="4" right="12" bottom="6" left="12"/></padding>
+                <Label text="■ FXU" styleClass="legend-fxu"/>
+                <Label text="■ FPU" styleClass="legend-fpu"/>
+                <Label text="■ Branch" styleClass="legend-branch"/>
+                <Label text="■ Load" styleClass="legend-load"/>
+                <Label text="■ Store" styleClass="legend-store"/>
+                <Label text="■ NOP" styleClass="legend-nop"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="🟥 Structural stall" styleClass="legend-stall"/>
+                <Label text="🟨 Data stall" styleClass="legend-stall"/>
+                <Label text="🟦 Control stall" styleClass="legend-stall"/>
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- ═══════════════════════  RIGHT — Analytics  ═══════════════════════ -->
+    <right>
+        <VBox styleClass="analytics-panel" spacing="10" minWidth="300" maxWidth="300">
+            <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
+
+            <Label text="ANALYTICS" styleClass="panel-header"/>
+            <Separator/>
+
+            <!-- Live IPC chart -->
+            <Label text="IPC Over Time" styleClass="chart-label"/>
+            <LineChart fx:id="ipcChart" styleClass="rsmt-chart" prefHeight="160" animated="false" createSymbols="false" legendVisible="false">
+                <xAxis><NumberAxis label="" animated="false" forceZeroInRange="false"/></xAxis>
+                <yAxis><NumberAxis label="IPC" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
+            </LineChart>
+
+            <!-- Cycles bar chart -->
+            <Label text="Cycles: SMT-ON vs SMT-OFF" styleClass="chart-label"/>
+            <BarChart fx:id="cyclesChart" styleClass="rsmt-chart" prefHeight="130" animated="false" legendVisible="true">
+                <xAxis><CategoryAxis animated="false"/></xAxis>
+                <yAxis><NumberAxis label="Cycles" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
+            </BarChart>
+
+            <!-- Unit utilization -->
+            <Label text="Unit Utilization %" styleClass="chart-label"/>
+            <BarChart fx:id="utilChart" styleClass="rsmt-chart" prefHeight="150" animated="false" legendVisible="false">
+                <xAxis><CategoryAxis animated="false"/></xAxis>
+                <yAxis><NumberAxis animated="false" forceZeroInRange="true" lowerBound="0" upperBound="100"/></yAxis>
+            </BarChart>
+
+            <!-- Stall breakdown -->
+            <Label text="Stall Breakdown" styleClass="chart-label"/>
+            <BarChart fx:id="stallChart" styleClass="rsmt-chart" prefHeight="130" animated="false" legendVisible="false">
+                <xAxis><CategoryAxis animated="false"/></xAxis>
+                <yAxis><NumberAxis label="Cycles" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
+            </BarChart>
+
+        </VBox>
+    </right>
+
+</BorderPane>

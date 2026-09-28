@@ -1,6 +1,7 @@
 package com.rsmt;
 
 import com.rsmt.core.*;
+import com.rsmt.gui.MainApp;
 import com.rsmt.sim.*;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  * rSMTv2 entry point.
  *
  * <ul>
- *   <li>No args → launches JavaFX GUI (wired in ST-8).</li>
+ *   <li>No args → launches JavaFX GUI.</li>
  *   <li>6 args → CLI mode: {@code <numInst> <rSmtDelay> <%int> <%load> <%rSmtAvail> <%depends>}</li>
  * </ul>
  */
@@ -17,10 +18,7 @@ public class Main {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            System.out.println("Usage: java -jar rSMTv2.jar <numInst> <rSmtDelay> <%int> <%load> <%rSmtAvail> <%depends>");
-            System.out.println("       (no args) — JavaFX GUI (coming in ST-8)");
-            System.out.println("Running default simulation: " + SimulationConfig.DEFAULT);
-            runCli(SimulationConfig.DEFAULT);
+            MainApp.launchGui(args);
             return;
         }
 
