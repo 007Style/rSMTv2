@@ -67,11 +67,18 @@
     -fx-background-radius: 4;
 }
 
-/* ─── Config panel ──────────────────────────────────────────────── */
+/* ─── Config panel (left) ────────────────────────────────────────── */
 .config-panel {
     -fx-background-color: #16213e;
     -fx-border-color: #0f3460;
     -fx-border-width: 0 2 0 0;
+}
+
+/* ─── Sliders panel (right) ──────────────────────────────────────── */
+.sliders-panel {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-width: 0 0 0 2;
 }
 
 .panel-header {

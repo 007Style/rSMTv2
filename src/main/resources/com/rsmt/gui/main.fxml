@@ -25,9 +25,9 @@
         </HBox>
     </top>
 
-    <!-- ═══════════════════════  LEFT PANEL — Config  ═══════════════════════ -->
+    <!-- ═══════════════════════  LEFT PANEL — Controls  ═══════════════════════ -->
     <left>
-        <VBox styleClass="config-panel" spacing="12" minWidth="220" maxWidth="220">
+        <VBox styleClass="config-panel" spacing="12" minWidth="190" maxWidth="190">
             <padding><Insets top="16" right="12" bottom="16" left="12"/></padding>
 
             <Label text="SIMULATION CONFIG" styleClass="panel-header"/>
@@ -40,30 +40,6 @@
             <!-- rSMT delay -->
             <Label text="rSMT Delay (cycles)" styleClass="param-label"/>
             <Spinner fx:id="rSmtDelaySpinner" editable="true" styleClass="param-spinner"/>
-
-            <!-- Integer mix -->
-            <Label fx:id="labelPercentInt" styleClass="param-label"/>
-            <Slider fx:id="percentIntSlider" min="0" max="100" value="60" showTickMarks="true"
-                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
-            <Label fx:id="percentIntLabel" styleClass="slider-value-label"/>
-
-            <!-- Load/Store mix -->
-            <Label fx:id="labelPercentLoad" styleClass="param-label"/>
-            <Slider fx:id="percentLoadSlider" min="0" max="100" value="15" showTickMarks="true"
-                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
-            <Label fx:id="percentLoadLabel" styleClass="slider-value-label"/>
-
-            <!-- rSMT availability -->
-            <Label fx:id="labelRsmtAvail" styleClass="param-label"/>
-            <Slider fx:id="rSmtAvailSlider" min="0" max="100" value="60" showTickMarks="true"
-                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
-            <Label fx:id="rSmtAvailLabel" styleClass="slider-value-label"/>
-
-            <!-- Data dependency -->
-            <Label fx:id="labelRsmtDepends" styleClass="param-label"/>
-            <Slider fx:id="rSmtDependsSlider" min="0" max="100" value="20" showTickMarks="true"
-                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
-            <Label fx:id="rSmtDependsLabel" styleClass="slider-value-label"/>
 
             <Separator/>
             <Label text="ANIMATION SPEED" styleClass="panel-header"/>
@@ -86,7 +62,54 @@
         </VBox>
     </left>
 
-    <!-- ═══════════════════════  CENTER — Pipeline grid (full width) ═══════════════════════ -->
+    <!-- ═══════════════════════  RIGHT PANEL — Mix sliders  ═══════════════════════ -->
+    <right>
+        <VBox styleClass="sliders-panel" spacing="10" minWidth="200" maxWidth="200">
+            <padding><Insets top="16" right="12" bottom="16" left="12"/></padding>
+
+            <Label text="WORKLOAD MIX" styleClass="panel-header"/>
+            <Separator/>
+
+            <!-- Integer mix -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label fx:id="labelPercentInt" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="percentIntLabel" styleClass="slider-value-label" minWidth="30"/>
+            </HBox>
+            <Slider fx:id="percentIntSlider" min="0" max="100" value="60" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+
+            <!-- Load/Store mix -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label fx:id="labelPercentLoad" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="percentLoadLabel" styleClass="slider-value-label" minWidth="30"/>
+            </HBox>
+            <Slider fx:id="percentLoadSlider" min="0" max="100" value="15" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+
+            <Separator/>
+            <Label text="rSMT PARAMS" styleClass="panel-header"/>
+            <Separator/>
+
+            <!-- rSMT availability -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label fx:id="labelRsmtAvail" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="rSmtAvailLabel" styleClass="slider-value-label" minWidth="30"/>
+            </HBox>
+            <Slider fx:id="rSmtAvailSlider" min="0" max="100" value="60" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+
+            <!-- Data dependency -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label fx:id="labelRsmtDepends" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="rSmtDependsLabel" styleClass="slider-value-label" minWidth="30"/>
+            </HBox>
+            <Slider fx:id="rSmtDependsSlider" min="0" max="100" value="20" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+
+        </VBox>
+    </right>
+
+    <!-- ═══════════════════════  CENTER — Pipeline grid  ═══════════════════════ -->
     <center>
         <VBox styleClass="pipeline-panel" spacing="0">
             <Label fx:id="pipelineHeaderLabel" styleClass="panel-header"
@@ -116,7 +139,7 @@
         </VBox>
     </center>
 
-    <!-- ═══════════════════════  BOTTOM — Analytics charts (horizontal strip) ═══════════════════════ -->
+    <!-- ═══════════════════════  BOTTOM — Analytics charts  ═══════════════════════ -->
     <bottom>
         <VBox styleClass="analytics-panel-bottom">
             <Separator/>
