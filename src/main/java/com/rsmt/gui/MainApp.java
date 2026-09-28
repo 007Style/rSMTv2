@@ -3,6 +3,7 @@ package com.rsmt.gui;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -33,6 +34,13 @@ public class MainApp extends Application {
         stage.setScene(scene);
         stage.setMinWidth(1100);
         stage.setMinHeight(800);
+
+        // Application icon — shown in taskbar, title bar, and Dock
+        URL iconUrl = getClass().getResource("icon.png");
+        if (iconUrl != null) {
+            stage.getIcons().add(new Image(iconUrl.toExternalForm()));
+        }
+
         stage.show();
     }
 

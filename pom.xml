@@ -76,6 +76,35 @@
                 </configuration>
             </plugin>
 
+            <!-- jpackage: native installer per platform -->
+            <!-- Run: mvn exec:exec@jpackage  (or use dist/build-dist.sh) -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>jpackage</id>
+                        <phase>none</phase><!-- manual only, not bound to lifecycle -->
+                        <goals><goal>exec</goal></goals>
+                        <configuration>
+                            <executable>jpackage</executable>
+                            <arguments>
+                                <argument>--input</argument><argument>${project.build.directory}</argument>
+                                <argument>--main-jar</argument><argument>rSMTv2.jar</argument>
+                                <argument>--main-class</argument><argument>${mainClass}</argument>
+                                <argument>--name</argument><argument>rSMTv2</argument>
+                                <argument>--app-version</argument><argument>${project.version}</argument>
+                                <argument>--description</argument><argument>IBM PowerPC Reverse SMT Processor Simulator</argument>
+                                <argument>--vendor</argument><argument>IBM Bob &amp; Daneyand</argument>
+                                <argument>--dest</argument><argument>${project.build.directory}/dist</argument>
+                                <argument>--icon</argument><argument>${project.basedir}/dist/icons/icon.icns</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Shade plugin: fat JAR with JavaFX bundled -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
