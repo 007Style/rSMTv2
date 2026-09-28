@@ -67,12 +67,10 @@
 
             <Separator/>
             <Label text="ANIMATION SPEED" styleClass="panel-header"/>
-
             <ComboBox fx:id="speedCombo" styleClass="param-spinner"/>
 
             <Separator/>
             <Label text="CONTROLS" styleClass="panel-header"/>
-
             <ToggleButton fx:id="smtToggle" text="rSMT ON" selected="true" styleClass="smt-toggle"/>
 
             <HBox spacing="8">
@@ -88,75 +86,94 @@
         </VBox>
     </left>
 
-    <!-- ═══════════════════════  CENTER — Pipeline + Analytics side-by-side ═══════════════════════ -->
+    <!-- ═══════════════════════  CENTER — Pipeline grid (full width) ═══════════════════════ -->
     <center>
-        <SplitPane dividerPositions="0.65" styleClass="main-split">
+        <VBox styleClass="pipeline-panel" spacing="0">
+            <Label fx:id="pipelineHeaderLabel" styleClass="panel-header"
+                   style="-fx-padding: 8 12 4 12;"/>
+            <Separator/>
+            <ScrollPane fx:id="pipelineScroll" fitToHeight="false" fitToWidth="false"
+                        hbarPolicy="ALWAYS" vbarPolicy="AS_NEEDED" styleClass="pipeline-scroll"
+                        VBox.vgrow="ALWAYS">
+                <GridPane fx:id="pipelineGrid" styleClass="pipeline-grid" hgap="2" vgap="1">
+                    <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
+                </GridPane>
+            </ScrollPane>
 
-            <!-- ── LEFT SPLIT: Pipeline grid ── -->
-            <VBox styleClass="pipeline-panel" spacing="0" SplitPane.resizableWithParent="true">
-                <Label fx:id="pipelineHeaderLabel" styleClass="panel-header"
-                       style="-fx-padding: 8 12 4 12;"/>
-                <Separator/>
-                <ScrollPane fx:id="pipelineScroll" fitToHeight="false" fitToWidth="false"
-                            hbarPolicy="ALWAYS" vbarPolicy="AS_NEEDED" styleClass="pipeline-scroll"
-                            VBox.vgrow="ALWAYS">
-                    <GridPane fx:id="pipelineGrid" styleClass="pipeline-grid" hgap="2" vgap="1">
-                        <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
-                    </GridPane>
-                </ScrollPane>
+            <!-- Legend -->
+            <HBox styleClass="stage-legend" spacing="12">
+                <padding><Insets top="4" right="12" bottom="6" left="12"/></padding>
+                <Label text="■ FXU" styleClass="legend-fxu"/>
+                <Label text="■ FPU" styleClass="legend-fpu"/>
+                <Label text="■ Branch" styleClass="legend-branch"/>
+                <Label text="■ Load/Store" styleClass="legend-load"/>
+                <Label text="■ NOP" styleClass="legend-nop"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="■ Structural" styleClass="legend-stall-struct"/>
+                <Label text="■ Data" styleClass="legend-stall-data"/>
+                <Label text="■ Control" styleClass="legend-stall-ctrl"/>
+            </HBox>
+        </VBox>
+    </center>
 
-                <!-- Stage legend row -->
-                <HBox styleClass="stage-legend" spacing="12">
-                    <padding><Insets top="4" right="12" bottom="6" left="12"/></padding>
-                    <Label text="■ FXU" styleClass="legend-fxu"/>
-                    <Label text="■ FPU" styleClass="legend-fpu"/>
-                    <Label text="■ Branch" styleClass="legend-branch"/>
-                    <Label text="■ Load/Store" styleClass="legend-load"/>
-                    <Label text="■ NOP" styleClass="legend-nop"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Label text="■ Structural" styleClass="legend-stall-struct"/>
-                    <Label text="■ Data" styleClass="legend-stall-data"/>
-                    <Label text="■ Control" styleClass="legend-stall-ctrl"/>
-                </HBox>
-            </VBox>
+    <!-- ═══════════════════════  BOTTOM — Analytics charts (horizontal strip) ═══════════════════════ -->
+    <bottom>
+        <VBox styleClass="analytics-panel-bottom">
+            <Separator/>
+            <HBox spacing="0" prefHeight="200" minHeight="180" maxHeight="220">
 
-            <!-- ── RIGHT SPLIT: Analytics ── -->
-            <VBox styleClass="analytics-panel" spacing="8" SplitPane.resizableWithParent="false">
-                <padding><Insets top="8" right="8" bottom="8" left="8"/></padding>
+                <!-- IPC over time -->
+                <VBox styleClass="chart-pane" HBox.hgrow="ALWAYS" spacing="2">
+                    <padding><Insets top="6" right="6" bottom="4" left="8"/></padding>
+                    <Label text="IPC Over Time" styleClass="chart-label"/>
+                    <LineChart fx:id="ipcChart" styleClass="rsmt-chart" animated="false"
+                               createSymbols="false" legendVisible="false" VBox.vgrow="ALWAYS">
+                        <xAxis><NumberAxis label="" animated="false" forceZeroInRange="false"/></xAxis>
+                        <yAxis><NumberAxis label="IPC" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
+                    </LineChart>
+                </VBox>
 
-                <Label text="ANALYTICS" styleClass="panel-header"/>
-                <Separator/>
+                <Separator orientation="VERTICAL"/>
 
-                <!-- Live IPC chart -->
-                <Label text="IPC Over Time" styleClass="chart-label"/>
-                <LineChart fx:id="ipcChart" styleClass="rsmt-chart" prefHeight="150" animated="false" createSymbols="false" legendVisible="false" VBox.vgrow="ALWAYS">
-                    <xAxis><NumberAxis label="" animated="false" forceZeroInRange="false"/></xAxis>
-                    <yAxis><NumberAxis label="IPC" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
-                </LineChart>
+                <!-- Cycles: SMT-ON vs SMT-OFF -->
+                <VBox styleClass="chart-pane" HBox.hgrow="ALWAYS" spacing="2">
+                    <padding><Insets top="6" right="6" bottom="4" left="6"/></padding>
+                    <Label text="Cycles: SMT-ON vs OFF" styleClass="chart-label"/>
+                    <BarChart fx:id="cyclesChart" styleClass="rsmt-chart" animated="false"
+                              legendVisible="true" VBox.vgrow="ALWAYS">
+                        <xAxis><CategoryAxis animated="false"/></xAxis>
+                        <yAxis><NumberAxis animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
+                    </BarChart>
+                </VBox>
 
-                <!-- Cycles bar chart -->
-                <Label text="Cycles: SMT-ON vs SMT-OFF" styleClass="chart-label"/>
-                <BarChart fx:id="cyclesChart" styleClass="rsmt-chart" prefHeight="120" animated="false" legendVisible="true" VBox.vgrow="ALWAYS">
-                    <xAxis><CategoryAxis animated="false"/></xAxis>
-                    <yAxis><NumberAxis label="Cycles" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
-                </BarChart>
+                <Separator orientation="VERTICAL"/>
 
                 <!-- Unit utilization -->
-                <Label text="Unit Utilization" styleClass="chart-label"/>
-                <BarChart fx:id="utilChart" styleClass="rsmt-chart" prefHeight="140" animated="false" legendVisible="false" VBox.vgrow="ALWAYS">
-                    <xAxis><CategoryAxis animated="false"/></xAxis>
-                    <yAxis><NumberAxis animated="false" forceZeroInRange="true" lowerBound="0" upperBound="100"/></yAxis>
-                </BarChart>
+                <VBox styleClass="chart-pane" HBox.hgrow="ALWAYS" spacing="2">
+                    <padding><Insets top="6" right="6" bottom="4" left="6"/></padding>
+                    <Label text="Unit Utilization" styleClass="chart-label"/>
+                    <BarChart fx:id="utilChart" styleClass="rsmt-chart" animated="false"
+                              legendVisible="false" VBox.vgrow="ALWAYS">
+                        <xAxis><CategoryAxis animated="false"/></xAxis>
+                        <yAxis><NumberAxis animated="false" forceZeroInRange="true" lowerBound="0" upperBound="100"/></yAxis>
+                    </BarChart>
+                </VBox>
+
+                <Separator orientation="VERTICAL"/>
 
                 <!-- Stall breakdown -->
-                <Label text="Stall Breakdown" styleClass="chart-label"/>
-                <BarChart fx:id="stallChart" styleClass="rsmt-chart" prefHeight="120" animated="false" legendVisible="false" VBox.vgrow="ALWAYS">
-                    <xAxis><CategoryAxis animated="false"/></xAxis>
-                    <yAxis><NumberAxis label="Cycles" animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
-                </BarChart>
+                <VBox styleClass="chart-pane" HBox.hgrow="ALWAYS" spacing="2">
+                    <padding><Insets top="6" right="8" bottom="4" left="6"/></padding>
+                    <Label text="Stall Breakdown" styleClass="chart-label"/>
+                    <BarChart fx:id="stallChart" styleClass="rsmt-chart" animated="false"
+                              legendVisible="false" VBox.vgrow="ALWAYS">
+                        <xAxis><CategoryAxis animated="false"/></xAxis>
+                        <yAxis><NumberAxis animated="false" forceZeroInRange="true" lowerBound="0"/></yAxis>
+                    </BarChart>
+                </VBox>
 
-            </VBox>
-        </SplitPane>
-    </center>
+            </HBox>
+        </VBox>
+    </bottom>
 
 </BorderPane>

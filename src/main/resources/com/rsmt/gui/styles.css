@@ -289,24 +289,15 @@
 .legend-stall-data   { -fx-text-fill: #ffe699; -fx-font-size: 10px; }
 .legend-stall-ctrl   { -fx-text-fill: #99b8ff; -fx-font-size: 10px; }
 
-/* ─── Main split pane ────────────────────────────────────────────── */
-.main-split {
-    -fx-background-color: #1a1a2e;
-    -fx-padding: 0;
-}
-
-.main-split > .split-pane-divider {
-    -fx-background-color: #0f3460;
-    -fx-padding: 0 1 0 1;
-}
-
-/* ─── Analytics panel ────────────────────────────────────────────── */
-.analytics-panel {
+/* ─── Analytics bottom strip ─────────────────────────────────────── */
+.analytics-panel-bottom {
     -fx-background-color: #16213e;
     -fx-border-color: #0f3460;
-    -fx-border-width: 0 0 0 2;
-    -fx-min-width: 280px;
-    -fx-max-width: 340px;
+    -fx-border-width: 1 0 0 0;
+}
+
+.chart-pane {
+    -fx-background-color: #16213e;
 }
 
 .chart-label {
