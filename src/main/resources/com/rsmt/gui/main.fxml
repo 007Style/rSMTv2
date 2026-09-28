@@ -73,7 +73,7 @@
 
             <!-- FXU mix -->
             <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label text="% FXU (integer)" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="labelPercentFxu" styleClass="param-label" HBox.hgrow="ALWAYS"/>
                 <Label fx:id="percentFxuLabel" styleClass="slider-value-label" minWidth="30"/>
             </HBox>
             <Slider fx:id="percentFxuSlider" min="0" max="100" showTickMarks="true"
@@ -81,7 +81,7 @@
 
             <!-- FPU mix -->
             <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label text="% FPU (float)" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="labelPercentFpu" styleClass="param-label" HBox.hgrow="ALWAYS"/>
                 <Label fx:id="percentFpuLabel" styleClass="slider-value-label" minWidth="30"/>
             </HBox>
             <Slider fx:id="percentFpuSlider" min="0" max="100" showTickMarks="true"
@@ -89,7 +89,7 @@
 
             <!-- Branch mix -->
             <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label text="% Branch" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="labelPercentBranch" styleClass="param-label" HBox.hgrow="ALWAYS"/>
                 <Label fx:id="percentBranchLabel" styleClass="slider-value-label" minWidth="30"/>
             </HBox>
             <Slider fx:id="percentBranchSlider" min="0" max="100" showTickMarks="true"
@@ -97,7 +97,7 @@
 
             <!-- LSU mix -->
             <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label text="% Load/Store" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="labelPercentLsu" styleClass="param-label" HBox.hgrow="ALWAYS"/>
                 <Label fx:id="percentLsuLabel" styleClass="slider-value-label" minWidth="30"/>
             </HBox>
             <Slider fx:id="percentLsuSlider" min="0" max="100" showTickMarks="true"

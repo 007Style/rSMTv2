@@ -45,6 +45,10 @@ public class SimulationController implements Initializable {
     @FXML private Slider  percentFpuSlider;
     @FXML private Slider  percentBranchSlider;
     @FXML private Slider  percentLsuSlider;
+    @FXML private Label   labelPercentFxu;
+    @FXML private Label   labelPercentFpu;
+    @FXML private Label   labelPercentBranch;
+    @FXML private Label   labelPercentLsu;
     @FXML private Label   percentFxuLabel;
     @FXML private Label   percentFpuLabel;
     @FXML private Label   percentBranchLabel;
@@ -147,7 +151,11 @@ public class SimulationController implements Initializable {
         lsuCyclesSpinner.setValueFactory(
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 30, InstructionGenerator.LSU_CYCLES));
 
-        // rSMT param labels contain % — must be set in code (FXML treats % as resource key prefix)
+        // All labels whose text starts with % must be set in code — FXML treats % as resource bundle key prefix
+        labelPercentFxu.setText("% FXU (integer)");
+        labelPercentFpu.setText("% FPU (float)");
+        labelPercentBranch.setText("% Branch");
+        labelPercentLsu.setText("% Load/Store");
         labelRsmtAvail.setText("% rSMT Availability");
         labelRsmtDepends.setText("% Data Dependency");
 
