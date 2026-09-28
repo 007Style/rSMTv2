@@ -58,7 +58,7 @@ Every sub-task from ST-2 onward must be designed so the GUI can observe and cont
 
 ### Sub-Task 0 — GitHub Hard Fork + Repo Setup
 
-**Status:** `[ ] pending`
+**Status:** `[x] done`
 
 **Intent:**
 Create the `rSMTv2` GitHub repository as a clean hard fork (new independent repo, not a GitHub fork). Initialize it from the current workspace, set origin to the new repo, and commit the original rSMT source as the baseline commit so history is traceable.
@@ -84,7 +84,7 @@ Create the `rSMTv2` GitHub repository as a clean hard fork (new independent repo
 
 ### Sub-Task 1 — Project Scaffold (Maven + Java 21)
 
-**Status:** `[ ] pending`
+**Status:** `[x] done`
 
 **Intent:**
 Create the rSMTv2 Maven project structure. This is the clean-room foundation — no simulation logic yet, just the correct package layout, `pom.xml`, and module structure that all subsequent phases build on.
@@ -113,7 +113,7 @@ Create the rSMTv2 Maven project structure. This is the clean-room foundation —
 
 ### Sub-Task 2 — Core Data Model (Modern Java 21)
 
-**Status:** `[ ] pending`
+**Status:** `[x] done`
 
 **Intent:**
 Replace the `rInst` inner class and index-based type detection with a proper, type-safe data model using Java 21 features. This eliminates the root cause of the FP bug and makes the simulation engine clean to write.
@@ -144,7 +144,7 @@ Replace the `rInst` inner class and index-based type detection with a proper, ty
 
 ### Sub-Task 3 — Instruction Generator (Fixed & Modernized)
 
-**Status:** `[ ] pending`
+**Status:** `[x] done`
 
 **Intent:**
 Rewrite `genInstructions.java` using the new data model. Fix the FP arithmetic bug in `execute()`. Use `ArrayList<Instruction>` and proper generics throughout.
@@ -170,7 +170,7 @@ Rewrite `genInstructions.java` using the new data model. Fix the FP arithmetic b
 
 ### Sub-Task 4 — Simulation Engine (Fixed, Modernized + GUI Hooks)
 
-**Status:** `[ ] pending`
+**Status:** `[x] done`
 
 **Intent:**
 Rewrite `rSMT.java` as a clean, testable simulation engine. Fix the inverted `rSMT_depends()` logic. Separate simulation from printing. Wire the `SimulationListener` and `SimulationControl` interfaces so the GUI can observe and control the engine in real time without polling or coupling to engine internals.
@@ -205,7 +205,7 @@ Rewrite `rSMT.java` as a clean, testable simulation engine. Fix the inverted `rS
 
 ### Sub-Task 5 — CLI Entry Point + Report
 
-**Status:** `[ ] pending`
+**Status:** `[x] done`
 
 **Intent:**
 Rewrite `Main.java` as a clean CLI entry point. Move all print logic into a `SimulationReport` class. The CLI wires config → generator → engine → report. When no args are given, launch the JavaFX GUI (stubbed for now).
