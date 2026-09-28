@@ -65,6 +65,10 @@ public class SimulationController implements Initializable {
 
     @FXML private ComboBox<String>  speedCombo;
 
+    // ─── Top-bar buttons ─────────────────────────────────────────────────────
+    @FXML private Button helpButton;
+    @FXML private Button aboutButton;
+
     // ─── Control buttons ─────────────────────────────────────────────────────
     @FXML private ToggleButton  smtToggle;
     @FXML private Button        runButton;
@@ -641,5 +645,561 @@ public class SimulationController implements Initializable {
         cyclesChart.getData().clear();
         utilChart.getData().clear();
         stallChart.getData().clear();
+    }
+
+    // ─── About & Help dialogs ─────────────────────────────────────────────────
+
+    @FXML
+    private void onAbout() {
+        showWebDialog("About rSMTv2", 620, 540, buildAboutHtml());
+    }
+
+    @FXML
+    private void onHelp() {
+        showWebDialog("rSMTv2 Help", 780, 700, buildHelpHtml());
+    }
+
+    private void showWebDialog(String title, double w, double h, String html) {
+        javafx.scene.web.WebView wv = new javafx.scene.web.WebView();
+        wv.getEngine().loadContent(html, "text/html");
+        wv.setPrefSize(w, h);
+        javafx.stage.Stage dialog = new javafx.stage.Stage();
+        dialog.setTitle(title);
+        dialog.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+        dialog.setScene(new javafx.scene.Scene(wv, w, h));
+        dialog.setResizable(true);
+        dialog.show();
+    }
+
+    // ─── About HTML ───────────────────────────────────────────────────────────
+
+    private static String buildAboutHtml() {
+        return """
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #0a0a1a;
+    color: #e6f1ff;
+    font-family: 'Menlo', 'Consolas', monospace;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* ── Animated chip grid background ── */
+  canvas#chip { position:fixed; top:0; left:0; z-index:0; opacity:0.18; }
+
+  .content { position:relative; z-index:1; padding: 32px 40px; }
+
+  .chip-icon {
+    font-size: 64px;
+    animation: pulse 2s ease-in-out infinite;
+    display: block;
+    margin-bottom: 12px;
+  }
+  @keyframes pulse {
+    0%,100% { transform: scale(1);   opacity: 1;   }
+    50%      { transform: scale(1.1); opacity: 0.8; }
+  }
+
+  h1 {
+    font-size: 22px;
+    color: #00d4aa;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    animation: glow 3s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { text-shadow: 0 0 8px #00d4aa88; }
+    50%      { text-shadow: 0 0 24px #00d4aacc, 0 0 48px #00d4aa44; }
+  }
+
+  .patent {
+    font-size: 12px;
+    color: #4a90d9;
+    margin: 6px 0 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .tagline {
+    font-size: 15px;
+    color: #ccd6f6;
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+  .tagline span { color: #00d4aa; font-style: normal; font-weight: bold; }
+
+  /* ── Signal line animation ── */
+  .signals {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+  .sig {
+    width: 40px; height: 3px;
+    border-radius: 2px;
+    background: #00d4aa;
+    animation: sig-flash 1.8s ease-in-out infinite;
+  }
+  .sig:nth-child(2) { animation-delay: 0.3s; background: #4488ff; }
+  .sig:nth-child(3) { animation-delay: 0.6s; background: #ffdd44; }
+  .sig:nth-child(4) { animation-delay: 0.9s; background: #ff6b6b; }
+  .sig:nth-child(5) { animation-delay: 1.2s; background: #44ddff; }
+  @keyframes sig-flash {
+    0%,100% { opacity: 0.25; transform: scaleX(1);   }
+    50%      { opacity: 1;    transform: scaleX(1.6); }
+  }
+
+  /* ── Pipeline animation ── */
+  .pipeline {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+  .stage {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    animation: stage-light 4s linear infinite;
+  }
+  .stage:nth-child(1) { background:#1a3a5a; color:#44aaff; animation-delay:0s; }
+  .stage:nth-child(2) { background:#1a3a5a; color:#44aaff; animation-delay:0.8s; }
+  .stage:nth-child(3) { background:#1a3a5a; color:#44aaff; animation-delay:1.6s; }
+  .stage:nth-child(4) { background:#1a3a5a; color:#44aaff; animation-delay:2.4s; }
+  .stage:nth-child(5) { background:#1a3a5a; color:#44aaff; animation-delay:3.2s; }
+  .arrow { color:#2a4a6a; font-size:12px; }
+  @keyframes stage-light {
+    0%,15%,100% { background:#1a3a5a; color:#44aaff; box-shadow:none; }
+    5%,10%      { background:#00d4aa; color:#0a0a1a;
+                  box-shadow: 0 0 14px #00d4aaaa; }
+  }
+
+  .version {
+    font-size: 10px;
+    color: #2a4a6a;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<canvas id="chip"></canvas>
+<div class="content">
+  <span class="chip-icon">⬛</span>
+  <h1>rSMTv2</h1>
+  <h1 style="font-size:14px; margin-top:2px;">IBM PowerPC Reverse Simultaneous Multithreading</h1>
+  <div class="patent">IBM Patent US8595468 &nbsp;·&nbsp; Filed 2009</div>
+
+  <div class="signals">
+    <div class="sig"></div>
+    <div class="sig"></div>
+    <div class="sig"></div>
+    <div class="sig"></div>
+    <div class="sig"></div>
+  </div>
+
+  <div class="pipeline">
+    <div class="stage">FETCH</div>
+    <div class="arrow">→</div>
+    <div class="stage">DISPATCH</div>
+    <div class="arrow">→</div>
+    <div class="stage">EXECUTE</div>
+    <div class="arrow">→</div>
+    <div class="stage">COMPLETE</div>
+    <div class="arrow">→</div>
+    <div class="stage">RETIRE</div>
+  </div>
+
+  <div class="tagline">
+    From the minds of <span>IBM Bob</span> &amp; <span>Daneyand</span>
+  </div>
+
+  <div class="version">Version 2.0 &nbsp;·&nbsp; Java 21 &nbsp;·&nbsp; JavaFX 21</div>
+</div>
+
+<script>
+  // Animated chip trace grid on canvas
+  var c = document.getElementById('chip');
+  var ctx = c.getContext('2d');
+  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize();
+
+  var nodes = [];
+  for (var i = 0; i < 60; i++) {
+    nodes.push({
+      x: Math.random() * c.width,
+      y: Math.random() * c.height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 2 + 1
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, c.width, c.height);
+    // Trace lines between nearby nodes
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i];
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > c.width)  n.vx *= -1;
+      if (n.y < 0 || n.y > c.height) n.vy *= -1;
+      for (var j = i+1; j < nodes.length; j++) {
+        var m = nodes[j];
+        var dx = n.x - m.x, dy = n.y - m.y;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 110) {
+          ctx.beginPath();
+          ctx.moveTo(n.x, n.y);
+          // Right-angle trace style
+          ctx.lineTo(n.x, m.y);
+          ctx.lineTo(m.x, m.y);
+          ctx.strokeStyle = '#00d4aa';
+          ctx.lineWidth = 0.5;
+          ctx.globalAlpha = 1 - dist/110;
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+        }
+      }
+      // Node dot
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+      ctx.fillStyle = '#00d4aa';
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+</script>
+</body>
+</html>
+""";
+    }
+
+    // ─── Help HTML ────────────────────────────────────────────────────────────
+
+    private static String buildHelpHtml() {
+        return """
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: -apple-system, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    line-height: 1.7;
+    padding: 28px 32px 40px;
+  }
+  h1 {
+    color: #00d4aa;
+    font-size: 20px;
+    border-bottom: 2px solid #00d4aa44;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    letter-spacing: 0.5px;
+  }
+  h2 {
+    color: #4488ff;
+    font-size: 14px;
+    font-weight: bold;
+    margin: 24px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  h3 {
+    color: #00d4aa;
+    font-size: 12px;
+    font-weight: bold;
+    margin: 14px 0 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  p { margin-bottom: 10px; color: #b0bec5; }
+  strong { color: #e6f1ff; }
+  code {
+    background: #161b22;
+    color: #00d4aa;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'Menlo', 'Consolas', monospace;
+    font-size: 11px;
+  }
+  .patent-box {
+    background: #0f3460;
+    border: 1px solid #4488ff44;
+    border-left: 3px solid #4488ff;
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin: 12px 0;
+  }
+  .patent-box .num { color: #4488ff; font-weight: bold; font-size: 15px; }
+  .patent-box .desc { color: #8892b0; font-size: 12px; margin-top: 4px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 16px;
+    font-size: 12px;
+  }
+  th {
+    background: #161b22;
+    color: #00d4aa;
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid #00d4aa44;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  td {
+    padding: 5px 10px;
+    border-bottom: 1px solid #21262d;
+    color: #b0bec5;
+    vertical-align: top;
+  }
+  td:first-child { color: #e6f1ff; font-weight: bold; white-space: nowrap; }
+  tr:hover td { background: #161b22; }
+
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-right: 4px;
+  }
+  .tag-fxu    { background:#1a4a2a; color:#1aff7a; }
+  .tag-fpu    { background:#1a2a4a; color:#4488ff; }
+  .tag-branch { background:#4a3a1a; color:#ffdd44; }
+  .tag-lsu    { background:#1a3a4a; color:#44ddff; }
+  .tag-nop    { background:#2a2a3a; color:#888899; }
+  .tag-stall  { background:#3a1a1a; color:#ff9999; }
+  .tag-remote { background:#3a2a1a; color:#ff9944; }
+
+  .tip {
+    background: #1a2a1a;
+    border-left: 3px solid #00d4aa;
+    padding: 8px 12px;
+    border-radius: 0 4px 4px 0;
+    margin: 10px 0;
+    font-size: 12px;
+    color: #8892b0;
+  }
+  .tip strong { color: #00d4aa; }
+
+  .section { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<h1>rSMTv2 — Help &amp; Reference</h1>
+
+<!-- ── WHAT IS THIS ── -->
+<h2>What is rSMTv2?</h2>
+<p>
+  <strong>rSMTv2</strong> is an interactive demonstration of <strong>Reverse Simultaneous
+  Multithreading (rSMT)</strong> — a technique invented at IBM and patented in 2009.
+  Traditional SMT lets a single physical core run multiple threads by sharing its
+  execution units. <strong>rSMT flips this</strong>: a single thread can dispatch
+  instructions to execution units on a <em>different</em> physical core, borrowing
+  idle capacity across cores when latency and data-hazard conditions allow it.
+</p>
+<p>
+  This simulator models a <strong>PowerPC 600-style in-order pipeline</strong> with two
+  execution paths — a <em>Local Core</em> (always active) and a <em>Remote Core</em>
+  (the rSMT target, active only when rSMT is ON and conditions are met). Watch
+  instructions flow through the pipeline in real time and compare IPC, stall counts,
+  and cycle counts with rSMT on vs. off.
+</p>
+
+<!-- ── THE PATENT ── -->
+<h2>The Patent</h2>
+<div class="patent-box">
+  <div class="num">IBM Patent US8,595,468 B2</div>
+  <div class="desc">
+    "Reverse Simultaneous Multi-Threading" — IBM Corporation, filed 2009.<br/>
+    Inventors describe a method by which a processor thread may dispatch fixed-point
+    and floating-point operations to an otherwise-idle execution unit on a sibling
+    core, subject to inter-core latency and data-dependency constraints, thereby
+    increasing effective instruction throughput without adding hardware threads.
+  </div>
+</div>
+<p>
+  The key insight: modern out-of-order cores often have FXU and FPU slots sitting
+  idle while the primary thread is stalled on a long-latency load or branch. rSMT
+  harvests that slack for the benefit of the <em>same</em> thread — no OS scheduling
+  changes required.
+</p>
+
+<!-- ── PIPELINE ── -->
+<h2>Pipeline Model (PowerPC 600 Style)</h2>
+<p>Every instruction travels through five named stages:</p>
+<table>
+  <tr><th>Stage</th><th>What happens</th></tr>
+  <tr><td>FETCH</td><td>Instruction is pulled from the stream into the pipeline.</td></tr>
+  <tr><td>DISPATCH</td><td>Instruction is decoded and routed to the correct execution unit queue.</td></tr>
+  <tr><td>EXECUTE</td><td>The execution unit processes the instruction for its full latency (FXU=5, FPU=6, Branch=4, LSU=3 cycles by default).</td></tr>
+  <tr><td>COMPLETE</td><td>Result is written back; the unit slot is freed.</td></tr>
+  <tr><td>RETIRE</td><td>Instruction is architecturally committed and removed from the pipeline.</td></tr>
+</table>
+<p>
+  The simulator uses a <strong>single-issue in-order pipeline</strong>. rSMT adds a
+  second issue opportunity per cycle to the remote FXU and FPU slots.
+</p>
+
+<!-- ── EXECUTION UNITS ── -->
+<h2>Execution Units &amp; Colours</h2>
+<table>
+  <tr><th>Unit</th><th>Instruction type</th><th>Latency</th><th>Core</th></tr>
+  <tr>
+    <td><span class="tag tag-fxu">FXU0</span></td>
+    <td>Integer: ADD, SUB, MUL, DIV</td>
+    <td>5 cycles (default)</td>
+    <td>Local</td>
+  </tr>
+  <tr>
+    <td><span class="tag tag-fxu">FXU1</span> <span class="tag tag-remote">REMOTE</span></td>
+    <td>Integer (rSMT offload)</td>
+    <td>5 + rSMT Delay</td>
+    <td>Remote</td>
+  </tr>
+  <tr>
+    <td><span class="tag tag-fpu">FPU0</span></td>
+    <td>Float: fADD, fSUB, fMUL, fDIV</td>
+    <td>6 cycles (default)</td>
+    <td>Local</td>
+  </tr>
+  <tr>
+    <td><span class="tag tag-fpu">FPU1</span> <span class="tag tag-remote">REMOTE</span></td>
+    <td>Float (rSMT offload)</td>
+    <td>6 + rSMT Delay</td>
+    <td>Remote</td>
+  </tr>
+  <tr>
+    <td><span class="tag tag-branch">Branch</span></td>
+    <td>Conditional branches</td>
+    <td>4 cycles (default)</td>
+    <td>Local</td>
+  </tr>
+  <tr>
+    <td><span class="tag tag-lsu">LSU</span></td>
+    <td>Load / Store</td>
+    <td>3 cycles (default)</td>
+    <td>Local</td>
+  </tr>
+  <tr>
+    <td><span class="tag tag-nop">NOP</span></td>
+    <td>No-operation (fills remainder %)</td>
+    <td>0 cycles</td>
+    <td>—</td>
+  </tr>
+</table>
+
+<!-- ── STALLS ── -->
+<h2>Stall Types</h2>
+<table>
+  <tr><th>Stall</th><th>Colour</th><th>Cause</th></tr>
+  <tr>
+    <td>Structural</td>
+    <td><span class="tag tag-stall">STALL</span></td>
+    <td>The target execution unit is still busy with a previous instruction. The new instruction must wait.</td>
+  </tr>
+  <tr>
+    <td>Data</td>
+    <td><span class="tag" style="background:#3a2a00;color:#ffe699;">DEP</span></td>
+    <td>A data hazard (read-after-write dependency) prevents issuing to the remote FXU slot.</td>
+  </tr>
+  <tr>
+    <td>Control</td>
+    <td><span class="tag" style="background:#1a1a3a;color:#99b8ff;">BR</span></td>
+    <td>A branch is in-flight. The Fetch stage is frozen until the branch retires.</td>
+  </tr>
+</table>
+
+<!-- ── GUI REFERENCE ── -->
+<h2>GUI Element Reference</h2>
+
+<h3>Left Panel — Simulation Config</h3>
+<table>
+  <tr><th>Control</th><th>What it does</th></tr>
+  <tr><td>Instructions</td><td>Total number of instructions to generate and simulate. More = longer run, smoother IPC curve.</td></tr>
+  <tr><td>rSMT Delay (cycles)</td><td>Extra latency added to remote-core execution (FXU1, FPU1). Models the real inter-core bus penalty. 0 = no overhead.</td></tr>
+  <tr><td><code>% rSMT Availability</code></td><td>Probability (0–100%) that the remote core slot is actually free each cycle. 100% = always available.</td></tr>
+  <tr><td><code>% Data Dependency</code></td><td>Probability that a data hazard blocks the rSMT issue attempt. 100% = always blocked (rSMT never fires).</td></tr>
+  <tr><td>Animation Speed</td><td>Delay between clock ticks. "Ludicrous ⚡" runs at full speed with no delay.</td></tr>
+  <tr><td>rSMT ON toggle</td><td>Enable or disable rSMT mid-simulation. The pipeline grid shows/hides the REMOTE CORE section dynamically.</td></tr>
+  <tr><td>▶ Run</td><td>Generate instructions and start the simulation. Runs SMT-ON pass, then SMT-OFF pass.</td></tr>
+  <tr><td>⏸ Pause / ▶ Resume</td><td>Freeze and unfreeze the simulation at any cycle.</td></tr>
+  <tr><td>⟳ Reset</td><td>Stop the simulation and clear the pipeline grid and all charts.</td></tr>
+  <tr><td>GAIN</td><td>Performance gain = (SMT-OFF cycles / SMT-ON cycles) × 100%. Values above 100% mean rSMT helped.</td></tr>
+</table>
+
+<h3>Right Panel — Workload Mix</h3>
+<p>Four sliders control the exact percentage of each instruction type generated.
+  They are <strong>mutually constrained</strong> — dragging one up automatically
+  trims the others (largest first) so the total never exceeds 100%. The
+  <strong>NOP remainder</strong> fills whatever percentage is left over.</p>
+<table>
+  <tr><th>Slider</th><th>Effect</th></tr>
+  <tr><td><code>% FXU (integer)</code></td><td>Share of integer ops (ADD/SUB/MUL/DIV). High values = more FXU congestion, more rSMT opportunities.</td></tr>
+  <tr><td><code>% FPU (float)</code></td><td>Share of floating-point ops. FPU has the longest latency (6 cycles), so high FPU = lots of structural stalls on FPU0.</td></tr>
+  <tr><td><code>% Branch</code></td><td>Share of branch ops. Each branch freezes Fetch for 4 cycles — high branch % hammers IPC.</td></tr>
+  <tr><td><code>% Load/Store</code></td><td>Share of memory ops. LSU has 3-cycle latency; shares one slot, so back-to-back LSU causes stalls.</td></tr>
+</table>
+
+<h3>Right Panel — Latency (cycles)</h3>
+<p>Override the default execution latency for each unit type. Changes take effect
+  on the next <strong>Run</strong>. Useful for modelling faster/slower hardware:</p>
+<table>
+  <tr><th>Spinner</th><th>Default</th><th>Tip</th></tr>
+  <tr><td>FXU cycles</td><td>5</td><td>Lower = integer ops retire faster = less structural stall on FXU0.</td></tr>
+  <tr><td>FPU cycles</td><td>6</td><td>The longest default. Reducing this has a big IPC impact when FPU % is high.</td></tr>
+  <tr><td>Branch cycles</td><td>4</td><td>Reduce to simulate a branch predictor that resolves early.</td></tr>
+  <tr><td>LSU cycles</td><td>3</td><td>Increase to model cache misses.</td></tr>
+</table>
+
+<h3>Pipeline Grid (Centre)</h3>
+<p>Each column is one clock cycle. Each row is one execution unit slot.
+  The grid auto-scrolls right as the simulation runs.</p>
+<div class="tip"><strong>LOCAL CORE</strong> rows are always visible.
+  <strong>REMOTE CORE</strong> rows (FXU1, FPU1) appear only when rSMT is ON —
+  cells have an orange border to make offloaded instructions immediately obvious.</div>
+
+<h3>Bottom Charts</h3>
+<table>
+  <tr><th>Chart</th><th>What it shows</th></tr>
+  <tr><td>IPC Over Time</td><td>Live instructions-per-cycle ratio, sampled every 5 ticks. Watch it stabilise as the pipeline fills.</td></tr>
+  <tr><td>Cycles: SMT-ON vs OFF</td><td>Final cycle counts for both passes. A shorter SMT-ON bar = rSMT helped.</td></tr>
+  <tr><td>Unit Utilization</td><td>Percentage of cycles each execution unit was busy. Low FXU1 utilization = rSMT conditions were rarely met.</td></tr>
+  <tr><td>Stall Breakdown</td><td>Total structural, data, and control stall cycles. Dominated by control stalls when branch % is high.</td></tr>
+</table>
+
+<div class="tip">
+  <strong>Pro tip:</strong> Set FXU=80%, rSMT Availability=100%, Data Dependency=0%,
+  rSMT Delay=0 and watch the GAIN soar. Then crank Data Dependency to 100% and
+  watch it collapse to 100% (no benefit). That's the patent in action.
+</div>
+
+</body>
+</html>
+""";
     }
 }

@@ -17,6 +17,8 @@
             <Label text="rSMTv2" styleClass="title-label"/>
             <Label text="Reverse SMT Processor Simulator" styleClass="subtitle-label"/>
             <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="helpButton"  text="?  Help"  onAction="#onHelp"  styleClass="topbar-button"/>
+            <Button fx:id="aboutButton" text="ℹ  About" onAction="#onAbout" styleClass="topbar-button"/>
             <Label text="Cycle:" styleClass="stat-label"/>
             <Label fx:id="cycleCountLabel" text="0" styleClass="stat-value"/>
             <Label text="IPC:" styleClass="stat-label"/>

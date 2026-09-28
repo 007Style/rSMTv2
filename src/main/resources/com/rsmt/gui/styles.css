@@ -26,6 +26,23 @@
     -fx-border-width: 0 0 2 0;
 }
 
+.topbar-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #8892b0;
+    -fx-font-size: 11px;
+    -fx-font-family: "Menlo", "Consolas", monospace;
+    -fx-cursor: hand;
+    -fx-border-color: #2a4a7a;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 3 10 3 10;
+}
+
+.topbar-button:hover {
+    -fx-text-fill: #00d4aa;
+    -fx-border-color: #00d4aa;
+}
+
 .title-label {
     -fx-text-fill: #00d4aa;
     -fx-font-size: 18px;
