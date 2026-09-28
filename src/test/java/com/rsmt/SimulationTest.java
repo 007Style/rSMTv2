@@ -4,6 +4,7 @@ import com.rsmt.core.*;
 import com.rsmt.sim.*;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -177,5 +178,81 @@ class SimulationTest {
 
         float expectedGain = ((float) result.normCycles() / (float) result.rCycles()) * 100f;
         assertEquals(expectedGain, result.performanceGain(), 0.01f);
+    }
+
+    // ─── ST-7: Pipeline stall tests ──────────────────────────────────────────
+
+    @Test
+    void pipeline_controlStalls_nonZeroWithBranches() {
+        // 100% branch mix → every other instruction is a branch → many control stalls
+        SimulationConfig config = new SimulationConfig(50, 0, 0, 0, 50, 20);
+        InstructionGenerator gen = new InstructionGenerator(SEED);
+        // Force a stream with branches
+        List<Instruction> insts = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            insts.add(new BranchInstruction(i, 0, 4));
+        }
+
+        SimulationEngine engine = new SimulationEngine(
+                new NoOpSimulationListener(), StaticSimulationControl.INSTANCE);
+        SimulationResult result = engine.run(config, insts, gen);
+
+        assertTrue(result.controlStalls() > 0,
+                "Branch-heavy stream should produce control stalls");
+    }
+
+    @Test
+    void pipeline_dataStalls_nonZeroAtHighDependsPercent() {
+        // 100% depends → every rSMT issue attempt is blocked by data hazard
+        SimulationConfig config = new SimulationConfig(100, 0, 80, 0, 100, 100);
+        InstructionGenerator gen = new InstructionGenerator(SEED);
+        List<Instruction> insts = gen.generate(config);
+
+        SimulationEngine engine = new SimulationEngine(
+                new NoOpSimulationListener(), StaticSimulationControl.INSTANCE);
+        SimulationResult result = engine.run(config, insts, gen);
+
+        assertTrue(result.dataStalls() > 0,
+                "100% depends should produce data stalls");
+    }
+
+    @Test
+    void pipeline_ipcWithinExpectedRange() {
+        SimulationConfig config = new SimulationConfig(200, 0, 60, 10, 80, 10);
+        InstructionGenerator gen = new InstructionGenerator(SEED);
+        List<Instruction> insts = gen.generate(config);
+
+        SimulationEngine engine = new SimulationEngine(
+                new NoOpSimulationListener(), StaticSimulationControl.INSTANCE);
+        SimulationResult result = engine.run(config, insts, gen);
+
+        // IPC must be > 0 and reasonable (single-issue pipeline ≤ ~1.5 with rSMT)
+        assertTrue(result.ipc() > 0.0, "IPC must be positive");
+        assertTrue(result.ipc() <= 2.0, "IPC should not exceed 2.0 for this pipeline model");
+    }
+
+    @Test
+    void pipeline_pipelineSnapshotContainsAllStages() {
+        SimulationConfig config = new SimulationConfig(10, 0, 50, 0, 50, 20);
+        InstructionGenerator gen = new InstructionGenerator(SEED);
+        List<Instruction> insts = gen.generate(config);
+
+        boolean[] sawAllStages = {false};
+        SimulationListener stageChecker = new SimulationListener() {
+            @Override public void onClockTick(ClockEvent e) {
+                if (e.pipelineSnapshot() != null
+                        && e.pipelineSnapshot().containsKey(PipelineStage.FETCH)
+                        && e.pipelineSnapshot().containsKey(PipelineStage.DECODE)
+                        && e.pipelineSnapshot().containsKey(PipelineStage.EXECUTE)) {
+                    sawAllStages[0] = true;
+                }
+            }
+            @Override public void onSimulationComplete(SimulationResult r) {}
+        };
+
+        SimulationEngine engine = new SimulationEngine(stageChecker, StaticSimulationControl.INSTANCE);
+        engine.run(config, insts, gen);
+
+        assertTrue(sawAllStages[0], "ClockEvent should contain all pipeline stage keys");
     }
 }

@@ -23,6 +23,11 @@ public final class SimulationReport {
         bar();
         printUtilization(r.unitUtilization());
         bar();
+        System.out.println("Pipeline Stalls (rSMT ON):");
+        System.out.printf("  Structural : %d cycles%n", r.structuralStalls());
+        System.out.printf("  Data       : %d cycles%n", r.dataStalls());
+        System.out.printf("  Control    : %d cycles%n", r.controlStalls());
+        bar();
         System.out.println("(4)**********************************************************");
         System.out.printf( "rSMT performance gain    : %.1f%%%n", r.performanceGain());
         System.out.println("(4)**********************************************************");
