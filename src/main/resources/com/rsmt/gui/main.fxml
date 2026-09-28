@@ -27,7 +27,7 @@
 
     <!-- ═══════════════════════  LEFT PANEL — Controls  ═══════════════════════ -->
     <left>
-        <VBox styleClass="config-panel" spacing="12" minWidth="190" maxWidth="190">
+        <VBox styleClass="config-panel" spacing="12" minWidth="220" maxWidth="220">
             <padding><Insets top="16" right="12" bottom="16" left="12"/></padding>
 
             <Label text="SIMULATION CONFIG" styleClass="panel-header"/>
@@ -40,6 +40,26 @@
             <!-- rSMT delay -->
             <Label text="rSMT Delay (cycles)" styleClass="param-label"/>
             <Spinner fx:id="rSmtDelaySpinner" editable="true" styleClass="param-spinner"/>
+
+            <Separator/>
+            <Label text="rSMT PARAMS" styleClass="panel-header"/>
+            <Separator/>
+
+            <!-- rSMT availability -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label fx:id="labelRsmtAvail" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="rSmtAvailLabel" styleClass="slider-value-label" minWidth="30"/>
+            </HBox>
+            <Slider fx:id="rSmtAvailSlider" min="0" max="100" value="60" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
+
+            <!-- Data dependency -->
+            <HBox alignment="CENTER_LEFT" spacing="6">
+                <Label fx:id="labelRsmtDepends" styleClass="param-label" HBox.hgrow="ALWAYS"/>
+                <Label fx:id="rSmtDependsLabel" styleClass="slider-value-label" minWidth="30"/>
+            </HBox>
+            <Slider fx:id="rSmtDependsSlider" min="0" max="100" value="20" showTickMarks="true"
+                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
 
             <Separator/>
             <Label text="ANIMATION SPEED" styleClass="panel-header"/>
@@ -105,26 +125,6 @@
 
             <!-- NOP remainder -->
             <Label fx:id="nopRemainderLabel" styleClass="nop-remainder-label"/>
-
-            <Separator/>
-            <Label text="rSMT PARAMS" styleClass="panel-header"/>
-            <Separator/>
-
-            <!-- rSMT availability -->
-            <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label fx:id="labelRsmtAvail" styleClass="param-label" HBox.hgrow="ALWAYS"/>
-                <Label fx:id="rSmtAvailLabel" styleClass="slider-value-label" minWidth="30"/>
-            </HBox>
-            <Slider fx:id="rSmtAvailSlider" min="0" max="100" value="60" showTickMarks="true"
-                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
-
-            <!-- Data dependency -->
-            <HBox alignment="CENTER_LEFT" spacing="6">
-                <Label fx:id="labelRsmtDepends" styleClass="param-label" HBox.hgrow="ALWAYS"/>
-                <Label fx:id="rSmtDependsLabel" styleClass="slider-value-label" minWidth="30"/>
-            </HBox>
-            <Slider fx:id="rSmtDependsSlider" min="0" max="100" value="20" showTickMarks="true"
-                    showTickLabels="true" majorTickUnit="25" styleClass="param-slider"/>
 
             <Separator/>
             <Label text="LATENCY (cycles)" styleClass="panel-header"/>
