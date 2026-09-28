@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.rsmt.SimulationTest" time="0.037" tests="12" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="27"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/Users/daneyand/Documents/bob/rSMTv2/target/test-classes:/Users/daneyand/Documents/bob/rSMTv2/target/classes:/Users/daneyand/.m2/repository/org/openjfx/javafx-controls/21.0.2/javafx-controls-21.0.2.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-controls/21.0.2/javafx-controls-21.0.2-mac-aarch64.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-graphics/21.0.2/javafx-graphics-21.0.2.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-graphics/21.0.2/javafx-graphics-21.0.2-mac-aarch64.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-base/21.0.2/javafx-base-21.0.2.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-base/21.0.2/javafx-base-21.0.2-mac-aarch64.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-fxml/21.0.2/javafx-fxml-21.0.2.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-fxml/21.0.2/javafx-fxml-21.0.2-mac-aarch64.jar:/Users/daneyand/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/daneyand/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/daneyand/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/daneyand/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/daneyand/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/daneyand/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/daneyand/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/daneyand/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:"/>
+    <property name="java.vm.vendor" value="Homebrew"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://github.com/Homebrew/homebrew-core/issues"/>
+    <property name="os.name" value="Mac OS X"/>
+    <property name="java.vm.specification.version" value="27"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="US"/>
+    <property name="sun.boot.library.path" value="/opt/homebrew/Cellar/openjdk/27/libexec/openjdk.jdk/Contents/Home/lib"/>
+    <property name="sun.java.command" value="/Users/daneyand/Documents/bob/rSMTv2/target/surefire/surefirebooter-20260928133222522_3.jar /Users/daneyand/Documents/bob/rSMTv2/target/surefire 2026-09-28T13-32-22_494-jvmRun1 surefire-20260928133222522_1tmp surefire_0-20260928133222522_2tmp"/>
+    <property name="http.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/Users/daneyand/Documents/bob/rSMTv2/target/test-classes:/Users/daneyand/Documents/bob/rSMTv2/target/classes:/Users/daneyand/.m2/repository/org/openjfx/javafx-controls/21.0.2/javafx-controls-21.0.2.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-controls/21.0.2/javafx-controls-21.0.2-mac-aarch64.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-graphics/21.0.2/javafx-graphics-21.0.2.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-graphics/21.0.2/javafx-graphics-21.0.2-mac-aarch64.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-base/21.0.2/javafx-base-21.0.2.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-base/21.0.2/javafx-base-21.0.2-mac-aarch64.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-fxml/21.0.2/javafx-fxml-21.0.2.jar:/Users/daneyand/.m2/repository/org/openjfx/javafx-fxml/21.0.2/javafx-fxml-21.0.2-mac-aarch64.jar:/Users/daneyand/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/Users/daneyand/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/Users/daneyand/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/Users/daneyand/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/Users/daneyand/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/Users/daneyand/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/Users/daneyand/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/Users/daneyand/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/Users/daneyand"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-09-15"/>
+    <property name="java.home" value="/opt/homebrew/Cellar/openjdk/27/libexec/openjdk.jdk/Contents/Home"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/Users/daneyand/Documents/bob/rSMTv2"/>
+    <property name="java.vm.compressedOopsMode" value="Non-zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="apple.awt.application.name" value="ForkedBooter"/>
+    <property name="surefire.real.class.path" value="/Users/daneyand/Documents/bob/rSMTv2/target/surefire/surefirebooter-20260928133222522_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="java.runtime.version" value="27"/>
+    <property name="user.name" value="daneyand"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="27.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Homebrew"/>
+    <property name="localRepository" value="/Users/daneyand/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/Homebrew/homebrew-core/issues"/>
+    <property name="java.io.tmpdir" value="/var/folders/7q/1sjpl3696m147_v3n250sfd40000gn/T/"/>
+    <property name="java.version" value="27"/>
+    <property name="user.dir" value="/Users/daneyand/Documents/bob/rSMTv2"/>
+    <property name="os.arch" value="aarch64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/Users/daneyand/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Homebrew"/>
+    <property name="java.vm.version" value="27"/>
+    <property name="stdin.encoding" value="UTF-8"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeBig"/>
+    <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
+    <property name="java.class.version" value="71.0"/>
+  </properties>
+  <testcase name="engine_smtOnFasterThanOff_atFullAvailability" classname="com.rsmt.SimulationTest" time="0.017">
+    <system-out><![CDATA[(1) Generating Instructions... Number: 200  %FXU: 80  %Load: 0
+Generated: 200 instructions.
+(2) Simulating rSMT Activated... START
+CYCLE: 2  rSMT instruction: div(1190043011, -1255373459)
+CYCLE: 8  rSMT instruction: sub(1184328952, -1329611232)
+CYCLE: 14  rSMT instruction: add(1874714453, 1888925827)
+CYCLE: 20  rSMT instruction: add(-1742253836, 1453021513)
+CYCLE: 26  rSMT instruction: add(-1771985870, 1177562329)
+CYCLE: 45  rSMT instruction: sub(1866855146, -1508419830)
+CYCLE: 51  rSMT instruction: mul(-741644490, 160514285)
+CYCLE: 57  rSMT instruction: div(1205047495, -1583211904)
+CYCLE: 63  rSMT instruction: sub(35002281, -1576812231)
+CYCLE: 69  rSMT instruction: mul(1475105044, 1593485692)
+CYCLE: 75  rSMT instruction: mul(1649115590, 1607861213)
+CYCLE: 81  rSMT instruction: add(734084664, -819802651)
+CYCLE: 87  rSMT instruction: sub(-4631432, -1976073951)
+CYCLE: 93  rSMT instruction: sub(-898897241, 117313442)
+CYCLE: 100  rSMT instruction: sub(-256957254, 585081510)
+CYCLE: 106  rSMT instruction: mul(-455082728, 1695469993)
+CYCLE: 112  rSMT instruction: sub(-965849238, 1574372582)
+CYCLE: 118  rSMT instruction: div(1852460425, 1191793993)
+CYCLE: 124  rSMT instruction: add(414253549, 1703047571)
+CYCLE: 130  rSMT instruction: sub(600391733, -263191339)
+CYCLE: 136  rSMT instruction: mul(60369309, 38453561)
+CYCLE: 142  rSMT instruction: mul(-573906649, -1905323946)
+CYCLE: 148  rSMT instruction: div(-478168309, -1604276948)
+CYCLE: 156  rSMT instruction: sub(-733864323, -1831654434)
+CYCLE: 162  rSMT instruction: mul(554625351, -1657398909)
+CYCLE: 168  rSMT instruction: mul(-17290377, -621217665)
+CYCLE: 174  rSMT instruction: mul(-2109930602, -2110709166)
+CYCLE: 180  rSMT instruction: div(552648062, -1300974275)
+CYCLE: 186  rSMT instruction: div(-759174475, -1535161563)
+CYCLE: 192  rSMT instruction: add(-1657450057, 172955764)
+CYCLE: 198  rSMT instruction: mul(65483733, 1914320704)
+CYCLE: 209  rSMT instruction: sub(1970495019, 1817637377)
+CYCLE: 215  rSMT instruction: add(1617907186, 2071169483)
+CYCLE: 221  rSMT instruction: mul(-137716524, -1389889077)
+CYCLE: 227  rSMT instruction: sub(-1695129669, 1586931918)
+CYCLE: 233  rSMT instruction: div(1417798659, -1838661884)
+CYCLE: 239  rSMT instruction: mul(934660604, -1817907583)
+CYCLE: 245  rSMT instruction: div(461893483, -499233859)
+CYCLE: 252  rSMT instruction: sub(-372311392, 868539890)
+CYCLE: 260  rSMT instruction: mul(2136027956, -1533939630)
+CYCLE: 266  rSMT instruction: sub(-1928974622, -132761919)
+CYCLE: 272  rSMT instruction: add(-1234394797, 1954995697)
+CYCLE: 278  rSMT instruction: div(176078269, 1278871506)
+CYCLE: 284  rSMT instruction: sub(-1548542537, 1974159083)
+CYCLE: 290  rSMT instruction: mul(1133881789, -1569088299)
+CYCLE: 298  rSMT instruction: add(50089519, 1119453216)
+CYCLE: 304  rSMT instruction: mul(353503035, 1459313114)
+CYCLE: 310  rSMT instruction: div(-1171828243, -2110639781)
+CYCLE: 316  rSMT instruction: mul(1856618508, -237433864)
+CYCLE: 322  rSMT instruction: add(-1185375854, -1311229148)
+CYCLE: 328  rSMT instruction: add(-685117650, -1179828996)
+CYCLE: 340  rSMT instruction: div(1246630177, -368747545)
+CYCLE: 347  rSMT instruction: sub(-239395962, -1911257499)
+CYCLE: 353  rSMT instruction: div(-288299077, 497861789)
+CYCLE: 359  rSMT instruction: mul(1846405697, -486792336)
+CYCLE: 365  rSMT instruction: div(1467883939, 868367222)
+CYCLE: 371  rSMT instruction: add(1079398024, 1790497128)
+CYCLE: 377  rSMT instruction: mul(-1387294732, -341973569)
+CYCLE: 383  rSMT instruction: div(630794128, -1110145383)
+CYCLE: 390  rSMT instruction: div(123482524, 1561348986)
+CYCLE: 399  rSMT instruction: mul(-1396653349, -204114546)
+CYCLE: 405  rSMT instruction: add(-501836189, 1339685581)
+CYCLE: 411  rSMT instruction: sub(635220157, 1625727887)
+CYCLE: 417  rSMT instruction: add(-517157915, -582435200)
+CYCLE: 429  rSMT instruction: mul(-1156943678, 1982884443)
+CYCLE: 435  rSMT instruction: mul(-267540761, -1253196556)
+CYCLE: 441  rSMT instruction: mul(-585809129, 1067018223)
+CYCLE: 453  rSMT instruction: div(596121722, 358500170)
+CYCLE: 460  rSMT instruction: sub(1274612112, -1506909959)
+CYCLE: 466  rSMT instruction: sub(1371082898, 2012659977)
+CYCLE: 472  rSMT instruction: add(-1475267705, -903071425)
+CYCLE: 478  rSMT instruction: mul(1902217961, -1720944207)
+CYCLE: 485  rSMT instruction: div(-1995147719, 1845294274)
+CYCLE: 491  rSMT instruction: div(1407305499, 267199556)
+CYCLE: 497  rSMT instruction: sub(1430603079, -2080956022)
+CYCLE: 503  rSMT instruction: add(-199754568, 542205212)
+CYCLE: 509  rSMT instruction: mul(-1750621162, 2011390034)
+CYCLE: 515  rSMT instruction: add(-2104587597, -1574093963)
+CYCLE: 521  rSMT instruction: sub(-74584859, 1810080133)
+CYCLE: 527  rSMT instruction: mul(-1120595836, 1253171892)
+(2) Simulating rSMT Activated... FINISHED
+(3) Simulating rSMT Deactivated... START
+(3) Simulating rSMT Deactivated... FINISHED
+]]></system-out>
+  </testcase>
+  <testcase name="simulationConfig_rejectsInvalidPercent" classname="com.rsmt.SimulationTest" time="0.001"/>
+  <testcase name="engine_performanceGainCalculation" classname="com.rsmt.SimulationTest" time="0.002">
+    <system-out><![CDATA[(1) Generating Instructions... Number: 100  %FXU: 50  %Load: 20
+Generated: 100 instructions.
+(2) Simulating rSMT Activated... START
+CYCLE: 2  rSMT instruction: div(1190043011, -1255373459)
+CYCLE: 16  rSMT instruction: add(-1803779346, 389401069)
+CYCLE: 41  rSMT instruction: sub(1866855146, -1508419830)
+CYCLE: 48  rSMT instruction: mul(-741644490, 160514285)
+CYCLE: 55  rSMT instruction: sub(2089890953, -1940620640)
+CYCLE: 67  rSMT instruction: div(-1567186245, -1314020411)
+CYCLE: 73  rSMT instruction: sub(1972954186, -1481534402)
+CYCLE: 80  rSMT instruction: sub(1197532648, -92098428)
+CYCLE: 87  rSMT instruction: sub(1427321858, -850316612)
+CYCLE: 93  rSMT instruction: sub(-1094558224, -489803805)
+CYCLE: 99  rSMT instruction: div(399203532, 1277138759)
+CYCLE: 107  rSMT instruction: div(-435642541, 1477220245)
+CYCLE: 119  rSMT instruction: mul(327123106, -450360464)
+CYCLE: 125  rSMT instruction: div(-1758440602, -714254763)
+CYCLE: 131  rSMT instruction: sub(-733864323, -1831654434)
+CYCLE: 142  rSMT instruction: mul(-589165719, 552648062)
+CYCLE: 151  rSMT instruction: add(-2065287419, 446061968)
+CYCLE: 157  rSMT instruction: add(-1835017223, 1208039393)
+CYCLE: 164  rSMT instruction: add(-639475282, 1144364112)
+CYCLE: 177  rSMT instruction: sub(-1734934104, 1962816760)
+CYCLE: 190  rSMT instruction: div(868539890, -1660337691)
+CYCLE: 205  rSMT instruction: mul(-132761919, -1000204880)
+(2) Simulating rSMT Activated... FINISHED
+(3) Simulating rSMT Deactivated... START
+(3) Simulating rSMT Deactivated... FINISHED
+]]></system-out>
+  </testcase>
+  <testcase name="engine_smtInstructionCount_nonZeroAtHighAvailability" classname="com.rsmt.SimulationTest" time="0.002">
+    <system-out><![CDATA[(1) Generating Instructions... Number: 100  %FXU: 70  %Load: 0
+Generated: 100 instructions.
+(2) Simulating rSMT Activated... START
+CYCLE: 2  rSMT instruction: div(1190043011, -1255373459)
+CYCLE: 10  rSMT instruction: sub(739670425, 681416186)
+CYCLE: 16  rSMT instruction: add(-1803779346, 389401069)
+CYCLE: 23  rSMT instruction: sub(-989838475, -111515869)
+CYCLE: 29  rSMT instruction: sub(942853202, -215349108)
+CYCLE: 36  rSMT instruction: sub(1866855146, -1508419830)
+CYCLE: 42  rSMT instruction: mul(-741644490, 160514285)
+CYCLE: 48  rSMT instruction: div(1205047495, -1583211904)
+CYCLE: 54  rSMT instruction: sub(35002281, -1576812231)
+CYCLE: 60  rSMT instruction: mul(1475105044, 1593485692)
+CYCLE: 66  rSMT instruction: mul(1649115590, 1607861213)
+CYCLE: 72  rSMT instruction: add(734084664, -819802651)
+CYCLE: 78  rSMT instruction: sub(-4631432, -1976073951)
+CYCLE: 85  rSMT instruction: mul(156699808, 2012929606)
+CYCLE: 92  rSMT instruction: sub(-784386698, -1519422095)
+CYCLE: 98  rSMT instruction: sub(-850316612, 1353548093)
+CYCLE: 105  rSMT instruction: div(-835840499, 1245824586)
+CYCLE: 117  rSMT instruction: div(-435642541, 1477220245)
+CYCLE: 129  rSMT instruction: div(-1905323946, 2063048363)
+CYCLE: 135  rSMT instruction: div(-1604276948, -1455775322)
+CYCLE: 144  rSMT instruction: add(-1657398909, -1336406806)
+CYCLE: 150  rSMT instruction: div(-621217665, -132613033)
+CYCLE: 156  rSMT instruction: add(-1300974275, 1726680318)
+CYCLE: 162  rSMT instruction: sub(-881006391, -1010079021)
+CYCLE: 171  rSMT instruction: div(-1202055376, -409976158)
+CYCLE: 177  rSMT instruction: mul(446061968, 1685467349)
+CYCLE: 191  rSMT instruction: sub(16138274, -1835017223)
+CYCLE: 197  rSMT instruction: mul(234975589, -639475282)
+CYCLE: 203  rSMT instruction: mul(1866607846, 2076585154)
+CYCLE: 209  rSMT instruction: sub(-1734934104, 1962816760)
+CYCLE: 215  rSMT instruction: div(-1518904237, -1964645508)
+CYCLE: 221  rSMT instruction: add(-1660337691, -1959843521)
+CYCLE: 229  rSMT instruction: mul(320894185, -1653305576)
+(2) Simulating rSMT Activated... FINISHED
+(3) Simulating rSMT Deactivated... START
+(3) Simulating rSMT Deactivated... FINISHED
+]]></system-out>
+  </testcase>
+  <testcase name="generator_correctFxuRatio" classname="com.rsmt.SimulationTest" time="0.002">
+    <system-out><![CDATA[(1) Generating Instructions... Number: 1000  %FXU: 50  %Load: 0
+Generated: 1000 instructions.
+]]></system-out>
+  </testcase>
+  <testcase name="instructionTypes_correctLatency" classname="com.rsmt.SimulationTest" time="0.0"/>
+  <testcase name="generator_noDivisionByZero" classname="com.rsmt.SimulationTest" time="0.001"/>
+  <testcase name="engine_listenerReceivesTickEvents" classname="com.rsmt.SimulationTest" time="0.001">
+    <system-out><![CDATA[(1) Generating Instructions... Number: 20  %FXU: 50  %Load: 0
+Generated: 20 instructions.
+(2) Simulating rSMT Activated... START
+CYCLE: 3  rSMT instruction: div(1190043011, -1255373459)
+CYCLE: 41  rSMT instruction: sub(1866855146, -1508419830)
+CYCLE: 48  rSMT instruction: mul(-741644490, 160514285)
+(2) Simulating rSMT Activated... FINISHED
+(3) Simulating rSMT Deactivated... START
+(3) Simulating rSMT Deactivated... FINISHED
+]]></system-out>
+  </testcase>
+  <testcase name="generator_fpuArithmeticCorrect" classname="com.rsmt.SimulationTest" time="0.0"/>
+  <testcase name="simulationConfig_defaultIsValid" classname="com.rsmt.SimulationTest" time="0.001"/>
+  <testcase name="engine_dependsFixVerification" classname="com.rsmt.SimulationTest" time="0.001">
+    <system-out><![CDATA[(1) Generating Instructions... Number: 100  %FXU: 80  %Load: 0
+Generated: 100 instructions.
+(2) Simulating rSMT Activated... START
+(2) Simulating rSMT Activated... FINISHED
+(3) Simulating rSMT Deactivated... START
+(3) Simulating rSMT Deactivated... FINISHED
+]]></system-out>
+  </testcase>
+  <testcase name="generator_fxuArithmeticCorrect" classname="com.rsmt.SimulationTest" time="0.0"/>
+</testsuite>
